@@ -4,17 +4,29 @@
 '''
 
 
+from __future__ import print_function
+
+import sys
+import os
+import time
+
+import numpy as np
+import theano
+import theano.tensor as T
+
+import lasagne
+
 class MnistNetwork():
 
 	def __init__(self):
 		print("Loading data...")
-		X_train, y_train, X_val, y_val, X_test, y_test = self.load_dataset()
+		self.X_train, self.y_train, self.X_val, self.y_val, self.X_test, self.y_test = self.load_dataset()
 
 		# Prepare Theano variables for inputs and targets
 		input_var = T.tensor4('inputs')
 		target_var = T.ivector('targets')
 
-		network = build_cnn(input_var)
+		network = self.build_cnn(input_var)
 
 		# Create a loss expression for training, i.e., a scalar objective we want
 		# to minimize (for our multi-class problem, it is the cross-entropy loss):
@@ -67,7 +79,7 @@ class MnistNetwork():
 		val_err = 0
 		val_acc = 0
 		val_batches = 0
-		for batch in iterate_minibatches(X_val, y_val, 500, shuffle=False):
+		for batch in self.iterate_minibatches(X_val, y_val, 500, shuffle=False):
 			inputs, targets = batch
 			err, acc = val_fn(inputs, targets)
 			val_err += err
@@ -92,7 +104,7 @@ class MnistNetwork():
 
 
 
-	def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
+	def iterate_minibatches(self, inputs, targets, batchsize, shuffle=False):
 		assert len(inputs) == len(targets)
 		if shuffle:
 			indices = np.arange(len(inputs))
@@ -105,7 +117,7 @@ class MnistNetwork():
 			yield inputs[excerpt], targets[excerpt]
 
 
-	def build_cnn(input_var=None):
+	def build_cnn(self, input_var=None):
 		# As a third model, we'll create a CNN of two convolution + pooling stages
 		# and a fully-connected hidden layer in front of the output layer.
 

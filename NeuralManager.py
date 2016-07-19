@@ -7,7 +7,10 @@ from mako.lookup import TemplateLookup
 
 from twisted.python import log
 
-import os, sys
+import os, sys, time
+
+network = ''
+
 
 root = os.path.join(os.path.dirname(__file__), ".")
 lookup = TemplateLookup(directories=[os.path.join(root, 'views')], 
@@ -20,6 +23,22 @@ class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.write("Hello, world")
 		#self.write(renderTemplate("myfile.html"))
+
+class StartHandler(tornado.web.RequestHandler):
+    def get(self):
+    	print "Initializing Neural Network"
+    	starttime = time.time()
+    	from mnistManaged import MnistNetwork
+    	network = MnistNetwork()
+    	print "wowe"
+    	self.write("time taken: " + str(time.time() - starttime))
+        # self.write("Hello, world")
+
+
+class TrainHandler(tornado.web.RequestHandler):
+    def get(self):
+    	print "We got something"
+        # self.write("Hello, world")
 
 def renderTemplate(templateName, **kwargs):
 	template = lookup.get_template(templateName)
@@ -35,6 +54,8 @@ if __name__ == "__main__":
 
 	app = tornado.web.Application([
 		(r"/", MainHandler),
+		(r"/start", StartHandler),
+		(r"/train", TrainHandler),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
 	])
 
