@@ -63,6 +63,7 @@ class MnistNetwork():
 	def train(self):
 		''' A function to train the network for one epoch, returns training loss'''
 		# In each epoch, we do a full pass over the training data:
+		print("training")
 		train_err = 0
 		train_batches = 0
 		start_time = time.time()
@@ -72,6 +73,7 @@ class MnistNetwork():
 			train_err += train_fn(inputs, targets)
 			train_batches += 1
 
+		print("done training")
 		return train_err
 
 	def val_acc(self):

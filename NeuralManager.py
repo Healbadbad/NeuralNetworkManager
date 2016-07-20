@@ -33,20 +33,17 @@ class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.write("Hello, world")
 		#self.write(renderTemplate("myfile.html"))
- 
-class StartHandler(tornado.web.RequestHandler): 
-	@gen.coroutine
-	def get(self):
-		print "Initializing Neural Network"
-		starttime = time.time() 
-		from mnistManaged import MnistNetwork
-		print initNetwork
-		print actionQueue.qsize()
-		yield actionQueue.put(initNetwork)
-		print actionQueue.qsize()
-		print "wowe"
-		self.write("time taken: " + str(time.time() - starttime))
-		# self.write("Hello, world")
+		self.render("views/index.html")
+
+class StartHandler(tornado.web.RequestHandler):
+    def get(self):
+    	print "Initializing Neural Network"
+    	starttime = time.time()
+    	from mnistManaged import MnistNetwork
+    	network = MnistNetwork()
+    	print "wowe"
+    	self.write("time taken: " + str(time.time() - starttime))
+        # self.write("Hello, world")
 
 
 class TrainHandler(tornado.web.RequestHandler):
