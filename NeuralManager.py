@@ -12,6 +12,7 @@ from twisted.python import log
 import os, sys, time
 
 network = ''
+initialized = False
 actionQueue = LifoQueue()
 
 root = os.path.join(os.path.dirname(__file__), ".")
@@ -22,11 +23,18 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 		module_directory=os.path.join(root, 'tmp/mako'))
 
 def initNetwork():
-	network = MnistNetwork()
+	from mnistManaged import MnistNetwork
+	app.network = MnistNetwork()
+	print app.network
+
+	app.initialized = True
 	# log. "WEEEWOOOO"
 
 def train():
-	network.train()
+	if app.initialized == False:
+		print "network not yet initialized"
+		return
+	app.network.train()
 	print "Done yay"
 
 class MainHandler(tornado.web.RequestHandler):
@@ -36,17 +44,30 @@ class MainHandler(tornado.web.RequestHandler):
 		self.render("views/index.html")
 
 class StartHandler(tornado.web.RequestHandler):
-    def get(self):
-    	print "Initializing Neural Network"
-    	starttime = time.time()
-    	from mnistManaged import MnistNetwork
-    	network = MnistNetwork()
-    	print "wowe"
-    	self.write("time taken: " + str(time.time() - starttime))
-        # self.write("Hello, world")
+	@gen.coroutine
+	def get(self):
+		print "Initializing Neural Network"
+		starttime = time.time()
+		yield actionQueue.put(initNetwork)
+		print "wowe"
+
+		# print self.application
+		self.write("time taken: " + str(time.time() - starttime))
+
+		# self.write("Hello, world")
 
 
 class TrainHandler(tornado.web.RequestHandler):
+	@gen.coroutine
+	def get(self):
+		print "Training Neural Network"
+		starttime = time.time()
+		yield actionQueue.put(train)
+		self.write("time taken: " + str(time.time() - starttime))
+
+		# self.write("Hello, world")
+
+class StopHandler(tornado.web.RequestHandler):
 	@gen.coroutine
 	def get(self):
 		print "Training Neural Network"
@@ -64,16 +85,16 @@ def renderTemplate(templateName, **kwargs):
 	except Exception, e:	
 		print e
 
-# @gen.coroutine
-# def consumer():
-# 	while True:
-# 		item = yield actionQueue.get()
-# 		try:
-# 			print 'Doing work on'
-# 			item()
-# 			yield gen.sleep(0.01)
-# 		finally:
-# 			q.task_done()
+@gen.coroutine
+def consumer():
+	while True:
+		item = yield actionQueue.get()
+		try:
+			print 'Doing work on'
+			item()
+			yield gen.sleep(0.01)
+		finally:
+			actionQueue.task_done()
 
 
 if __name__ == "__main__":
@@ -87,6 +108,7 @@ if __name__ == "__main__":
 		(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
 	], autoreload=True)
 
+	app.initialized = False
 	app.listen(8888)
+	tornado.ioloop.IOLoop.current().spawn_callback(consumer)
 	tornado.ioloop.IOLoop.current().start()
-	# IOLoop.current().spawn_callback(consumer)
