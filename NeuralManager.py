@@ -10,6 +10,8 @@ from mako.lookup import TemplateLookup
 from twisted.python import log
 
 import os, sys, time
+import signal
+import json
 
 network = ''
 initialized = False
@@ -91,9 +93,9 @@ class LoadHandler(tornado.web.RequestHandler):
 			yield actionQueue.put(initNetwork)
 			self.write("time taken: " + str(time.time() - starttime))
 
-class StartHandler(BaseHandler):
+class LoadHandler(BaseHandler):
 	@gen.coroutine
-	def get(self):
+	def post(self):
 		if self.current_user == ourSecretUsername:
 			print "Initializing Neural Network"
 			starttime = time.time()
@@ -123,17 +125,23 @@ class StopHandler(BaseHandler):
 	def post(self):
 		if self.current_user == ourSecretUsername:
 			print "Stopping Neural Network and Backing up"
-		# IOLoop.set_blocking_signal_threshold(0.05, action)
+			tornado.ioloop.IOLoop.current().set_blocking_signal_threshold(0.05, signal.CTRL_BREAK_EVENT)
 		# tornado.ioloop.IOLoop.current().spawn_callback(tester)
 		#TODO
 
+def wowhandler():
+	print "wow"
+
 class LoginHandler(BaseHandler):
 	def post(self):
+		print self.request.body
 		args = convertRequestArgs(self.request.body)
+
 		print "Send the ajax login data here for verification"
 
 		if args["password"] == ourSecretPassword:
-			self.set_secure_cookie("user", args["username"])
+			self.set_secure_cookie("user", ourSecretUsername)
+			print "authenticated user"
 
 
 def renderTemplate(templateName, **kwargs):
@@ -173,11 +181,11 @@ if __name__ == "__main__":
 		(r"/js/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'js')}),
 		(r"/savedStates", SavedStatesHandler),
 		(r"/buildLog", BuildLogHandler),
-		(r"/start", StartHandler),
 		(r"/load", LoadHandler),
 		(r"/train", TrainHandler),
 		(r"/stop", StopHandler),
 		(r"/snapshot", SnapshotHandler),
+		(r"/login", LoginHandler),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
 	], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77")
 
