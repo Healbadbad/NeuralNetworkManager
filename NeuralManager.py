@@ -24,7 +24,6 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 		default_filters=['decode.utf8'],
 		module_directory=os.path.join(root, 'tmp/mako'))
 
-
 #############################
 #
 #	Network Functions
@@ -78,10 +77,11 @@ class MainHandler(BaseHandler):
 class LoadHandler(tornado.web.RequestHandler):
 	@gen.coroutine
 	def post(self):
-		print "Initializing Neural Network"
-		starttime = time.time()
-		yield actionQueue.put(initNetwork)
-		self.write("time taken: " + str(time.time() - starttime))
+		if self.current_user == ourSecretUsername:
+			print "Initializing Neural Network"
+			starttime = time.time()
+			yield actionQueue.put(initNetwork)
+			self.write("time taken: " + str(time.time() - starttime))
 
 class StartHandler(BaseHandler):
 	@gen.coroutine
