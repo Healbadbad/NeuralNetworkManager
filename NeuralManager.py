@@ -14,6 +14,7 @@ import os, sys, time
 network = ''
 initialized = False
 actionQueue = Queue()
+ourSecretPassword = "password"
 
 root = os.path.join(os.path.dirname(__file__), ".")
 lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
@@ -63,10 +64,15 @@ def snapshot():
 #
 #############################
 
-class MainHandler(tornado.web.RequestHandler):
+class BaseHandler(tornado.web.RequestHandler):
+	def get_current_user(self):
+		return self.get_secure_cookie("user")
+
+class MainHandler(BaseHandler):
 	def get(self):
 		self.render("views/index.html")
 
+<<<<<<< HEAD
 	def post(self):
 		print self.request.body
 
@@ -77,30 +83,68 @@ class LoadHandler(tornado.web.RequestHandler):
 		starttime = time.time()
 		yield actionQueue.put(initNetwork)
 		self.write("time taken: " + str(time.time() - starttime))
-
-
-class TrainHandler(tornado.web.RequestHandler):
+=======
+class StartHandler(BaseHandler):
 	@gen.coroutine
+	def get(self):
+		if self.current_user != None:
+			print "Initializing Neural Network"
+			starttime = time.time()
+			yield actionQueue.put(initNetwork)
+			self.write("time taken: " + str(time.time() - starttime))
+>>>>>>> c9fb5afb2f18ab11020160d0218ddbab6f0e53b7
+
+
+class TrainHandler(BaseHandler):
+	@gen.coroutine
+<<<<<<< HEAD
 	def post(self):
 		print "Training Neural Network"
 		starttime = time.time()
 		yield actionQueue.put(train)
 		self.write("time taken: " + str(time.time() - starttime))
-
-class SnapshotHandler(tornado.web.RequestHandler):
+=======
 	def get(self):
-		print "Getting a snapshot"
-		print sys.getsizeof(app.network)
-		print app.network
-		self.write("Network Snapshot: " + str(app.snapshot))
+		if self.current_user != None:
+			print "Training Neural Network"
+			starttime = time.time()
+			yield actionQueue.put(train)
+			self.write("time taken: " + str(time.time() - starttime))
+>>>>>>> c9fb5afb2f18ab11020160d0218ddbab6f0e53b7
 
-class StopHandler(tornado.web.RequestHandler):
+class SnapshotHandler(BaseHandler):
+	def get(self):
+		if self.current_user != None:
+			print "Getting a snapshot"
+			print sys.getsizeof(app.network)
+			print app.network
+			self.write("Network Snapshot: " + str(app.snapshot))
+
+class StopHandler(BaseHandler):
 	@gen.coroutine
+<<<<<<< HEAD
 	def post(self):
 		print "Stopping Neural Network and Backing up"
 		# IOLoop.set_blocking_signal_threshold(0.05, action)
 		# tornado.ioloop.IOLoop.current().spawn_callback(tester)
 		#TODO 
+=======
+	def get(self):
+		if self.current_user != None:
+			print "Training Neural Network"
+			starttime = time.time()
+			yield actionQueue.put(train)
+			self.write("time taken: " + str(time.time() - starttime))
+
+
+class LoginHandler(BaseHandler):
+	def post(self):
+		args = convertRequestArgs(self.request.body)
+		print "Send the ajax login data here for verification"
+
+		if args["password"] == ourSecretPassword:
+			self.set_secure_cookie("user", args["username"])
+>>>>>>> c9fb5afb2f18ab11020160d0218ddbab6f0e53b7
 
 def renderTemplate(templateName, **kwargs):
 	template = lookup.get_template(templateName)
@@ -109,6 +153,9 @@ def renderTemplate(templateName, **kwargs):
 		return template.render(*args, **kwargs)
 	except Exception, e:
 		print e
+
+def convertRequestArgs(args):
+	return json.loads(args)
 
 @gen.coroutine
 def tester():
@@ -140,7 +187,7 @@ if __name__ == "__main__":
 		(r"/stop", StopHandler),
 		(r"/snapshot", SnapshotHandler),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
-	], autoreload=True)
+	], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77")
 
 	app.initialized = False
 	app.snapshot = 'No Snapshot'
