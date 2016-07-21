@@ -55,23 +55,25 @@ class MnistNetwork():
 
 		# Compile a function performing a training step on a mini-batch (by giving
 		# the updates dictionary) and returning the corresponding training loss:
-		train_fn = theano.function([input_var, target_var], loss, updates=updates)
+		self.train_fn = theano.function([input_var, target_var], loss, updates=updates)
 
 		# Compile a second function computing the validation loss and accuracy:
-		val_fn = theano.function([input_var, target_var], [test_loss, test_acc])
+		self.val_fn = theano.function([input_var, target_var], [test_loss, test_acc])
 
 	def train(self):
 		''' A function to train the network for one epoch, returns training loss'''
 		# In each epoch, we do a full pass over the training data:
+		print("training")
 		train_err = 0
 		train_batches = 0
 		start_time = time.time()
-		for batch in iterate_minibatches(X_train, y_train, 500, shuffle=True):
+		for batch in self.iterate_minibatches(self.X_train, self.y_train, 500, shuffle=True):
 			inputs, targets = batch
 			
-			train_err += train_fn(inputs, targets)
+			train_err += self.train_fn(inputs, targets)
 			train_batches += 1
 
+		print("done training")
 		return train_err
 
 	def val_acc(self):
@@ -79,9 +81,9 @@ class MnistNetwork():
 		val_err = 0
 		val_acc = 0
 		val_batches = 0
-		for batch in self.iterate_minibatches(X_val, y_val, 500, shuffle=False):
+		for batch in self.iterate_minibatches(self.X_val, self.y_val, 500, shuffle=False):
 			inputs, targets = batch
-			err, acc = val_fn(inputs, targets)
+			err, acc = self.val_fn(inputs, targets)
 			val_err += err
 			val_acc += acc
 			val_batches += 1

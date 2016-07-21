@@ -20711,7 +20711,7 @@ ol.ui.horizontal.list li:before,
   border: 1px solid rgba(34, 36, 38, 0.15);
   box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
   border-radius: 0.28571429rem;
-  min-height: 2.85714286em;
+  min-height: 4.85714286em;
 }
 
 .ui.menu:after {
@@ -36867,3 +36867,7 @@ html.ios body {
 /*******************************
          Site Overrides
 *******************************/
+
+.logo {
+  font-size: 2em;
+}
