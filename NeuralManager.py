@@ -132,6 +132,7 @@ if __name__ == "__main__":
 
 	app = tornado.web.Application([
 		(r"/", MainHandler),
+		(r"/views/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'views')}),
 		(r"/css/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'css')}),
 		(r"/js/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'js')}),
 		(r"/load", LoadHandler),
