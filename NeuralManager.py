@@ -8,7 +8,7 @@ from mako.template import Template
 from mako.lookup import TemplateLookup
 
 from twisted.python import log
-
+from tornado.concurrent import return_future
 import os, sys, time
 import signal
 import json
@@ -32,24 +32,25 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 #
 #############################
 
-def initNetwork():
+def initNetwork(callback=None):
 	from mnistManaged import MnistNetwork
 	app.network = MnistNetwork()
 	app.initialized = True
 
-def train():
+@return_future
+def train(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
 	app.train_err = app.network.train()
 
-def validation():
+def validation(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
 	app.val_acc = app.network.val_acc()
 
-def snapshot():
+def snapshot(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
@@ -117,7 +118,16 @@ class StopHandler(BaseHandler):
 	def post(self):
 		if self.current_user == ourSecretUsername:
 			print "Stopping Neural Network and Backing up"
-			tornado.ioloop.IOLoop.current().set_blocking_signal_threshold(0.05, signal.CTRL_BREAK_EVENT)
+
+			tornado.ioloop.IOLoop.current().stop()
+			# print "here?"
+			for item in range(actionQueue.qsize()):
+				actionQueue.get()
+			print "queue supposedly emptied, ",actionQueue.qsize()
+
+			# tornado.ioloop.IOLoop.current().close()
+			# tornado.ioloop.IOLoop.current().spawn_callback(consumer)
+			# tornado.ioloop.IOLoop.current().start()
 		# tornado.ioloop.IOLoop.current().spawn_callback(tester)
 		#TODO 
 
@@ -158,6 +168,7 @@ def consumer():
 		try:
 			print 'Doing work on'
 			item()
+			print "item completed"
 			yield gen.sleep(0.01)
 		finally:
 			actionQueue.task_done()
@@ -179,9 +190,10 @@ if __name__ == "__main__":
 		(r"/login", LoginHandler),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
 	], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77")
-
 	app.initialized = False
 	app.snapshot = 'No Snapshot'
 	app.listen(8888)
 	tornado.ioloop.IOLoop.current().spawn_callback(consumer)
-	tornado.ioloop.IOLoop.current().start()
+	while True:
+		print "Starting continuation loop"
+		tornado.ioloop.IOLoop.current().start()
