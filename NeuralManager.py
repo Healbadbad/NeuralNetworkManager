@@ -16,7 +16,7 @@ initialized = False
 actionQueue = Queue()
 
 root = os.path.join(os.path.dirname(__file__), ".")
-lookup = TemplateLookup(directories=[os.path.join(root, 'views')], 
+lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 		input_encoding='utf-8',
 		output_encoding='utf-8',
 		default_filters=['decode.utf8'],
@@ -62,8 +62,6 @@ def snapshot():
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
-		self.write("Hello, world")
-		#self.write(renderTemplate("myfile.html"))
 		self.render("views/index.html")
 
 class StartHandler(tornado.web.RequestHandler):
@@ -101,9 +99,9 @@ class StopHandler(tornado.web.RequestHandler):
 def renderTemplate(templateName, **kwargs):
 	template = lookup.get_template(templateName)
 	args = []
-	try: 
+	try:
 		return template.render(*args, **kwargs)
-	except Exception, e:	
+	except Exception, e:
 		print e
 
 @gen.coroutine
@@ -124,6 +122,8 @@ if __name__ == "__main__":
 
 	app = tornado.web.Application([
 		(r"/", MainHandler),
+		(r"/css/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'css')}),
+		(r"/js/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'js')}),
 		(r"/start", StartHandler),
 		(r"/train", TrainHandler),
 		(r"/snapshot", SnapshotHandler),
