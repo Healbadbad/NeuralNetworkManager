@@ -15,6 +15,7 @@ network = ''
 initialized = False
 actionQueue = Queue()
 ourSecretPassword = "password"
+ourSecretUsername = "guinness"
 
 root = os.path.join(os.path.dirname(__file__), ".")
 lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
@@ -72,7 +73,7 @@ class MainHandler(BaseHandler):
 class StartHandler(BaseHandler):
 	@gen.coroutine
 	def get(self):
-		if self.current_user != None:
+		if self.current_user == ourSecretUsername:
 			print "Initializing Neural Network"
 			starttime = time.time()
 			yield actionQueue.put(initNetwork)
@@ -82,7 +83,7 @@ class StartHandler(BaseHandler):
 class TrainHandler(BaseHandler):
 	@gen.coroutine
 	def get(self):
-		if self.current_user != None:
+		if self.current_user == ourSecretUsername:
 			print "Training Neural Network"
 			starttime = time.time()
 			yield actionQueue.put(train)
@@ -90,7 +91,7 @@ class TrainHandler(BaseHandler):
 
 class SnapshotHandler(BaseHandler):
 	def get(self):
-		if self.current_user != None:
+		if self.current_user == ourSecretUsername:
 			print "Getting a snapshot"
 			print sys.getsizeof(app.network)
 			print app.network
@@ -99,7 +100,7 @@ class SnapshotHandler(BaseHandler):
 class StopHandler(BaseHandler):
 	@gen.coroutine
 	def get(self):
-		if self.current_user != None:
+		if self.current_user == ourSecretUsername:
 			print "Training Neural Network"
 			starttime = time.time()
 			yield actionQueue.put(train)
