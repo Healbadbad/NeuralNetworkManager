@@ -38,7 +38,7 @@ def train():
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
-	app.network.train()
+	app.train_err = app.network.train()
 
 def validation():
 	if app.initialized == False:
@@ -53,6 +53,9 @@ def snapshot():
 	print sys.getsizeof(app.network)
 	app.snapshot = app.network.snapshot()
 
+# def save():
+
+
 
 #############################
 #
@@ -64,9 +67,12 @@ class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("views/index.html")
 
-class StartHandler(tornado.web.RequestHandler):
+	def post(self):
+		print self.request.body
+
+class LoadHandler(tornado.web.RequestHandler):
 	@gen.coroutine
-	def get(self):
+	def post(self):
 		print "Initializing Neural Network"
 		starttime = time.time()
 		yield actionQueue.put(initNetwork)
@@ -75,7 +81,7 @@ class StartHandler(tornado.web.RequestHandler):
 
 class TrainHandler(tornado.web.RequestHandler):
 	@gen.coroutine
-	def get(self):
+	def post(self):
 		print "Training Neural Network"
 		starttime = time.time()
 		yield actionQueue.put(train)
@@ -90,11 +96,11 @@ class SnapshotHandler(tornado.web.RequestHandler):
 
 class StopHandler(tornado.web.RequestHandler):
 	@gen.coroutine
-	def get(self):
-		print "Training Neural Network"
-		starttime = time.time()
-		yield actionQueue.put(train)
-		self.write("time taken: " + str(time.time() - starttime))
+	def post(self):
+		print "Stopping Neural Network and Backing up"
+		# IOLoop.set_blocking_signal_threshold(0.05, action)
+		# tornado.ioloop.IOLoop.current().spawn_callback(tester)
+		#TODO 
 
 def renderTemplate(templateName, **kwargs):
 	template = lookup.get_template(templateName)
@@ -103,6 +109,10 @@ def renderTemplate(templateName, **kwargs):
 		return template.render(*args, **kwargs)
 	except Exception, e:
 		print e
+
+@gen.coroutine
+def tester():
+	print "tester here"
 
 @gen.coroutine
 def consumer():
@@ -124,8 +134,9 @@ if __name__ == "__main__":
 		(r"/", MainHandler),
 		(r"/css/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'css')}),
 		(r"/js/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'js')}),
-		(r"/start", StartHandler),
+		(r"/load", LoadHandler),
 		(r"/train", TrainHandler),
+		(r"/stop", StopHandler),
 		(r"/snapshot", SnapshotHandler),
 		(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
 	], autoreload=True)
