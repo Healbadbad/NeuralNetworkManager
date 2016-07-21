@@ -17,7 +17,10 @@
     </div>
 
 
-    
+    <button id="login" class="ui labeled icon button" type="submit" name="action" value="login">
+      <i class="pause icon"></i>
+      Login
+    </button>
     <button id="pause" class="ui labeled icon button" type="submit" name="action" value="pause">
       <i class="pause icon"></i>
       Pause
@@ -34,6 +37,16 @@
    </body>
 
    <script>
+
+   $("#login").click(function() {
+      $.ajax("/login", {
+        data:"{\"password\":\"password\"}",
+        contentType : 'application/json',
+        type : 'POST',
+        success: function(data) {
+        }
+      })
+    });
 
     $("#pause").click(function() {
       $.ajax("/load", {
@@ -61,6 +74,8 @@
         }
       })
     });
+
+
 
    </script>
  </html>
