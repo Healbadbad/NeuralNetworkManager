@@ -385,6 +385,7 @@ input::-moz-focus-inner {
 
 input {
   line-height: normal;
+  margin: 5em;
 }
 
 /**
@@ -25132,6 +25133,7 @@ Floated Menu / Item
   display: flex;
   margin: 0.875em 0.5em;
   float: none;
+  margin-left: 2em;
 }
 
 /* Clearing */
@@ -26418,6 +26420,7 @@ a.ui.card:hover,
 
 .ui.feed {
   margin: 1em 0em;
+  margin-left: 5em;
 }
 
 .ui.feed:first-child {
@@ -36870,4 +36873,8 @@ html.ios body {
 
 .logo {
   font-size: 2em;
+}
+
+#filter-wrapper {
+  margin: 1em;
 }
