@@ -17,19 +17,50 @@
     </div>
 
 
-    <form class="ui form">
-      <button id="pause" class="ui labeled icon button" type="submit" name="action" value="pause">
-        <i class="pause icon"></i>
-        Pause
-      </button>
-      <button id="play" class="ui labeled icon button" type="submit" name="action" value="play">
-        <i class="play icon"></i>
-        Run
-      </button>
-      <button id="stop" class="ui labeled icon button" type="submit" name="action" value="stop">
-        <i class="stop icon"></i>
-        Stop
-      </button>
-    </form>
-  </body>
+    
+    <button id="pause" class="ui labeled icon button" type="submit" name="action" value="pause">
+      <i class="pause icon"></i>
+      Pause
+    </button>
+    <button id="play" class="ui labeled icon button" type="submit" name="action" value="play">
+      <i class="play icon"></i>
+      Run
+    </button>
+    <button id="stop" class="ui labeled icon button" type="submit" name="action" value="stop">
+      <i class="stop icon"></i>
+      Stop
+    </button>
+    
+   </body>
+
+   <script>
+
+    $("#pause").click(function() {
+      $.ajax("/load", {
+        contentType : 'application/json',
+        type : 'POST',
+        success: function(data) {
+        }
+      })
+    });
+
+    $("#play").click(function() {
+      $.ajax("/train", {
+        contentType : 'application/json',
+        type : 'POST',
+        success: function(data) {
+        }
+      })
+    });
+
+    $("#stop").click(function() {
+      $.ajax("/stop", {
+        contentType : 'application/json',
+        type : 'POST',
+        success: function(data) {
+        }
+      })
+    });
+
+   </script>
  </html>
