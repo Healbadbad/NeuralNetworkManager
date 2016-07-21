@@ -71,8 +71,6 @@ class BaseHandler(tornado.web.RequestHandler):
 class MainHandler(BaseHandler):
 	def get(self):
 		self.render("views/index.html")
-
-<<<<<<< HEAD
 	def post(self):
 		print self.request.body
 
@@ -83,7 +81,7 @@ class LoadHandler(tornado.web.RequestHandler):
 		starttime = time.time()
 		yield actionQueue.put(initNetwork)
 		self.write("time taken: " + str(time.time() - starttime))
-=======
+
 class StartHandler(BaseHandler):
 	@gen.coroutine
 	def get(self):
@@ -92,25 +90,16 @@ class StartHandler(BaseHandler):
 			starttime = time.time()
 			yield actionQueue.put(initNetwork)
 			self.write("time taken: " + str(time.time() - starttime))
->>>>>>> c9fb5afb2f18ab11020160d0218ddbab6f0e53b7
 
 
 class TrainHandler(BaseHandler):
 	@gen.coroutine
-<<<<<<< HEAD
 	def post(self):
 		print "Training Neural Network"
 		starttime = time.time()
 		yield actionQueue.put(train)
 		self.write("time taken: " + str(time.time() - starttime))
-=======
-	def get(self):
-		if self.current_user != None:
-			print "Training Neural Network"
-			starttime = time.time()
-			yield actionQueue.put(train)
-			self.write("time taken: " + str(time.time() - starttime))
->>>>>>> c9fb5afb2f18ab11020160d0218ddbab6f0e53b7
+
 
 class SnapshotHandler(BaseHandler):
 	def get(self):
@@ -122,19 +111,11 @@ class SnapshotHandler(BaseHandler):
 
 class StopHandler(BaseHandler):
 	@gen.coroutine
-<<<<<<< HEAD
 	def post(self):
 		print "Stopping Neural Network and Backing up"
 		# IOLoop.set_blocking_signal_threshold(0.05, action)
 		# tornado.ioloop.IOLoop.current().spawn_callback(tester)
 		#TODO 
-=======
-	def get(self):
-		if self.current_user != None:
-			print "Training Neural Network"
-			starttime = time.time()
-			yield actionQueue.put(train)
-			self.write("time taken: " + str(time.time() - starttime))
 
 
 class LoginHandler(BaseHandler):
@@ -144,7 +125,7 @@ class LoginHandler(BaseHandler):
 
 		if args["password"] == ourSecretPassword:
 			self.set_secure_cookie("user", args["username"])
->>>>>>> c9fb5afb2f18ab11020160d0218ddbab6f0e53b7
+
 
 def renderTemplate(templateName, **kwargs):
 	template = lookup.get_template(templateName)
