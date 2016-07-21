@@ -1,20 +1,5 @@
-<html>
-   <head>
-      <title> Neural Network Manager </title>
-      <link rel="stylesheet" type="text/css" href="/css/semantic.css">
-      <script src="/js/jquery-3.1.0.min.js"></script>
-      <script src="/js/semantic.js"></script>
-   </head>
-   <body>
-     <div class="ui tiered nav menu">
-      <div class="container">
-        <a class="item logo" href="/views/index.html">
-          <b>Neural Network</b> Manager
-        </a>
-        <a class="item" href="/views/savedStates.html"> Saved States </a>
-        <a class="item" href="/views/buildLog.html"> Build Log </a>
-      </div>
-    </div>
+<%inherit file="index.html" />
+<%block name="content">
     <div class="ui feed">
       <div class="event">
         <div class="content">
@@ -99,5 +84,4 @@
         </div>
       </div>
     </div>
-  </body>
- </html>
+ </%block>

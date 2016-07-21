@@ -1,81 +1,17 @@
+<%namespace file="header.html" import="*"/>
+<!DOCTYPE html>
 <html>
    <head>
-      <title> Neural Network Manager </title>
-      <link rel="stylesheet" type="text/css" href="/css/semantic.css">
-      <script src="/js/jquery-3.1.0.min.js"></script>
-      <script src="/js/semantic.js"></script>
-   </head>
-   <body>
-     <div class="ui tiered nav menu">
-      <div class="container">
-        <a class="item logo" href="/views/index.html">
-          <b>Neural Network</b> Manager
-        </a>
-        <a class="item" href="/views/savedStates.html"> Saved States </a>
-        <a class="item" href="/views/buildLog.html"> Build Log </a>
-      </div>
+    <title> Neural Network Manager </title>
+    <link rel="stylesheet" type="text/css" href="/css/semantic.css">
+    <script src="/js/jquery-3.1.0.min.js"></script>
+    <script src="/js/semantic.js"></script>
+  </head>
+  <body>
+    ${createHeaderBar()}
+
+    <div id="content-container">
+      <%block name="content"/>
     </div>
-
-
-    <button id="login" class="ui labeled icon button" type="submit" name="action" value="login">
-      <i class="pause icon"></i>
-      Login
-    </button>
-    <button id="pause" class="ui labeled icon button" type="submit" name="action" value="pause">
-      <i class="pause icon"></i>
-      Pause
-    </button>
-    <button id="play" class="ui labeled icon button" type="submit" name="action" value="play">
-      <i class="play icon"></i>
-      Run
-    </button>
-    <button id="stop" class="ui labeled icon button" type="submit" name="action" value="stop">
-      <i class="stop icon"></i>
-      Stop
-    </button>
-    
-   </body>
-
-   <script>
-
-   $("#login").click(function() {
-      $.ajax("/login", {
-        data:"{\"password\":\"password\"}",
-        contentType : 'application/json',
-        type : 'POST',
-        success: function(data) {
-        }
-      })
-    });
-
-    $("#pause").click(function() {
-      $.ajax("/load", {
-        contentType : 'application/json',
-        type : 'POST',
-        success: function(data) {
-        }
-      })
-    });
-
-    $("#play").click(function() {
-      $.ajax("/train", {
-        contentType : 'application/json',
-        type : 'POST',
-        success: function(data) {
-        }
-      })
-    });
-
-    $("#stop").click(function() {
-      $.ajax("/stop", {
-        contentType : 'application/json',
-        type : 'POST',
-        success: function(data) {
-        }
-      })
-    });
-
-
-
-   </script>
+  </body>
  </html>
