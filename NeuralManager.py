@@ -67,7 +67,15 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
 	def get(self):
-		self.render("views/index.html")
+		self.write(renderTemplate("main.html"))
+
+class SavedStatesHandler(BaseHandler):
+	def get(self):
+		self.write(renderTemplate("savedStates.html"))
+
+class BuildLogHandler(BaseHandler):
+	def get(self):
+		self.write(renderTemplate("buildLog.html"))
 
 class StartHandler(BaseHandler):
 	@gen.coroutine
@@ -143,9 +151,10 @@ if __name__ == "__main__":
 
 	app = tornado.web.Application([
 		(r"/", MainHandler),
-		(r"/views/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'views')}),
 		(r"/css/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'css')}),
 		(r"/js/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'js')}),
+		(r"/savedStates", SavedStatesHandler),
+		(r"/buildLog", BuildLogHandler),
 		(r"/start", StartHandler),
 		(r"/train", TrainHandler),
 		(r"/snapshot", SnapshotHandler),
