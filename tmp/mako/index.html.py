@@ -5,10 +5,10 @@ STOP_RENDERING = runtime.STOP_RENDERING
 __M_dict_builtin = dict
 __M_locals_builtin = locals
 _magic_number = 10
-_modified_time = 1469068781.72
+_modified_time = 1469069862.844
 _enable_loop = True
-_template_filename = 'views/index.html'
-_template_uri = 'index.html'
+_template_filename = u'views/index.html'
+_template_uri = u'index.html'
 _source_encoding = 'utf-8'
 _exports = [u'content']
 
@@ -20,15 +20,15 @@ def _mako_get_namespace(context, name):
         _mako_generate_namespaces(context)
         return context.namespaces[(__name__, name)]
 def _mako_generate_namespaces(context):
-    ns = runtime.TemplateNamespace('__anon_0x3ffbeb8L', context._clean_inheritance_tokens(), templateuri=u'header.html', callables=None,  calling_uri=_template_uri)
-    context.namespaces[(__name__, '__anon_0x3ffbeb8L')] = ns
+    ns = runtime.TemplateNamespace('__anon_0x3f6c3c8L', context._clean_inheritance_tokens(), templateuri=u'header.html', callables=None,  calling_uri=_template_uri)
+    context.namespaces[(__name__, '__anon_0x3f6c3c8L')] = ns
 
 def render_body(context,**pageargs):
     __M_caller = context.caller_stack._push_frame()
     try:
         __M_locals = __M_dict_builtin(pageargs=pageargs)
         _import_ns = {}
-        _mako_get_namespace(context, '__anon_0x3ffbeb8L')._populate(_import_ns, [u'*'])
+        _mako_get_namespace(context, '__anon_0x3f6c3c8L')._populate(_import_ns, [u'*'])
         def content():
             return render_content(context._locals(__M_locals))
         createHeaderBar = _import_ns.get('createHeaderBar', context.get('createHeaderBar', UNDEFINED))
@@ -50,7 +50,7 @@ def render_content(context,**pageargs):
     __M_caller = context.caller_stack._push_frame()
     try:
         _import_ns = {}
-        _mako_get_namespace(context, '__anon_0x3ffbeb8L')._populate(_import_ns, [u'*'])
+        _mako_get_namespace(context, '__anon_0x3f6c3c8L')._populate(_import_ns, [u'*'])
         def content():
             return render_content(context)
         __M_writer = context.writer()

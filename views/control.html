@@ -1,5 +1,35 @@
 <%inherit file="index.html" />
 <%block name="content">
+<script>
+
+ $("#pause").click(function() {
+   $.ajax("/load", {
+     contentType : 'application/json',
+     type : 'POST',
+     success: function(data) {
+     }
+   })
+ });
+
+ $("#play").click(function() {
+   $.ajax("/train", {
+     contentType : 'application/json',
+     type : 'POST',
+     success: function(data) {
+     }
+   })
+ });
+
+ $("#stop").click(function() {
+   $.ajax("/stop", {
+     contentType : 'application/json',
+     type : 'POST',
+     success: function(data) {
+     }
+   })
+ });
+
+</script>
   <form class="ui form">
     <button id="pause" class="ui labeled icon button" type="submit" name="action" value="pause">
       <i class="pause icon"></i>
