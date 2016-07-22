@@ -42,7 +42,7 @@ def initNetwork(callback=None):
 	from mnistManaged import MnistNetwork
 	app.network = MnistNetwork()
 	app.initialized = True
-	
+
 
 @gen.coroutine
 def train(callback=None):
@@ -69,9 +69,15 @@ def snapshot(callback=None):
 @gen.coroutine
 def idle(callback=None):
 	gen.sleep(0.01)
-# def save():
 
 
+@return_future
+def save(callback=None):
+	if app.initialized == False:
+		print "network not yet initialized"
+		return
+	print 'futureeeeee'
+	print app.network.params
 
 #############################
 #
@@ -143,6 +149,15 @@ class SnapshotHandler(BaseHandler):
 			print sys.getsizeof(app.network)
 			print app.network
 			self.write("Network Snapshot: " + str(app.snapshot))
+
+class SaveParameterHandler(BaseHandler):
+	@gen.coroutine
+	def post(self):
+		if self.current_user == ourSecretUsername:
+			print "Saving current network parameters..."
+			starttime = time.time()
+			yield actionQueue.put(save)
+			self.write("time taken: " + str(time.time() - starttime))
 
 class StopHandler(BaseHandler):
 	@gen.coroutine
@@ -241,6 +256,7 @@ app = tornado.web.Application([
 	(r"/load", LoadHandler),
 	(r"/train", TrainHandler),
 	(r"/stop", StopHandler),
+	(r"/save", SaveParameterHandler),
 	(r"/snapshot", SnapshotHandler),
 	(r"/login", LoginHandler),
 	(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})

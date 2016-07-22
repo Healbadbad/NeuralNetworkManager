@@ -34,3 +34,12 @@ $("#login").click(function() {
      }
    })
  });
+
+ $("#save").click(function() {
+   $.ajax("/save", {
+     contentType : 'application/json',
+     type : 'POST',
+     success: function(data) {
+     }
+   });
+ });
