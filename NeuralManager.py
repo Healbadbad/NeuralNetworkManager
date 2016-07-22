@@ -7,12 +7,16 @@ from mako import exceptions
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
+from concurrent.futures import ThreadPoolExecutor
 from twisted.python import log
 from tornado.concurrent import return_future
+from tornado.concurrent import run_on_executor
+
 import os, sys, time
 import signal
 import json
-
+from datetime import timedelta
+import time
 network = ''
 initialized = False
 actionQueue = Queue()
@@ -32,24 +36,29 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 #
 #############################
 
+@gen.coroutine
 def initNetwork(callback=None):
+	print "doing the thing"
 	from mnistManaged import MnistNetwork
 	app.network = MnistNetwork()
 	app.initialized = True
+	
 
-@return_future
+@gen.coroutine
 def train(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
 	app.train_err = app.network.train()
 
+@return_future
 def validation(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
 	app.val_acc = app.network.val_acc()
 
+@return_future
 def snapshot(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
@@ -84,6 +93,17 @@ class BuildLogHandler(BaseHandler):
 		self.write(renderTemplate("buildLog.html"))
 	def post(self):
 		print self.request.body
+
+# @return_future
+# @gen.engine
+class Tasks():
+	executor = ThreadPoolExecutor(max_workers=4)
+
+	@run_on_executor
+	def futureCreator(self, func):
+		result = func()
+		# callback(result)
+		# gen.Return(func())
 
 class LoadHandler(tornado.web.RequestHandler):
 	@gen.coroutine
@@ -127,11 +147,9 @@ class StopHandler(BaseHandler):
 		if self.current_user == ourSecretUsername:
 			print "Stopping Neural Network and Backing up"
 
-			tornado.ioloop.IOLoop.current().stop()
+			# tornado.ioloop.IOLoop.current().stop()
 			# print "here?"
-			for item in range(actionQueue.qsize()):
-				actionQueue.get()
-			print "queue supposedly emptied, ",actionQueue.qsize()
+			app.stopState = True
 
 			# tornado.ioloop.IOLoop.current().close()
 			# tornado.ioloop.IOLoop.current().spawn_callback(consumer)
@@ -171,38 +189,74 @@ def tester():
 
 @gen.coroutine
 def consumer():
+	runner = Tasks()
 	while True:
 		item = yield actionQueue.get()
-		try:
-			print 'Doing work on'
-			item()
-			print "item completed"
-			yield gen.sleep(0.01)
-		finally:
-			actionQueue.task_done()
+		print item
+		future = runner.futureCreator(item)
+		while True:
+			if app.stopState == True:
+				for item in range(actionQueue.qsize()):
+					actionQueue.get()
+					actionQueue.task_done()
+				print "queue supposedly emptied, ",actionQueue.qsize()
+				app.stopState = False
+				break
+
+			try:
+				result = yield gen.with_timeout(time.time() + 1, future)
+				# print result
+				actionQueue.task_done()
+				print "ding fries are done"
+				# yield gen.sleep(0.01)
+				break
+			except gen.TimeoutError:
+				print('tick')
 
 
-if __name__ == "__main__":
 
-	log.startLogging(sys.stdout)
 
-	app = tornado.web.Application([
-		(r"/", MainHandler),
-		(r"/css/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'css')}),
-		(r"/js/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'js')}),
-		(r"/savedStates", SavedStatesHandler),
-		(r"/buildLog", BuildLogHandler),
-		(r"/load", LoadHandler),
-		(r"/train", TrainHandler),
-		(r"/stop", StopHandler),
-		(r"/snapshot", SnapshotHandler),
-		(r"/login", LoginHandler),
-		(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
-	], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77")
-	app.initialized = False
-	app.snapshot = 'No Snapshot'
+		# try:
+		# 	print 'Doing work on'
+		# 	item()
+		# 	print "item completed"
+		# 	yield gen.sleep(0.01)
+		# finally:
+		# 	actionQueue.task_done()
+
+app = ''
+
+log.startLogging(sys.stdout)
+
+app = tornado.web.Application([
+	(r"/", MainHandler),
+	(r"/css/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'css')}),
+	(r"/js/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'js')}),
+	(r"/savedStates", SavedStatesHandler),
+	(r"/buildLog", BuildLogHandler),
+	(r"/load", LoadHandler),
+	(r"/train", TrainHandler),
+	(r"/stop", StopHandler),
+	(r"/snapshot", SnapshotHandler),
+	(r"/login", LoginHandler),
+	(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
+], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77")
+app.initialized = False
+app.stopState = False
+app.snapshot = 'No Snapshot'
+
+
+@gen.coroutine
+def main():
 	app.listen(8888)
 	tornado.ioloop.IOLoop.current().spawn_callback(consumer)
+	# future = futureCreator(consumer)
+	# gen.with_timeout(time.time() + 100, future)
 	while True:
 		print "Starting continuation loop"
 		tornado.ioloop.IOLoop.current().start()
+
+
+
+if __name__ == "__main__":
+	main()
