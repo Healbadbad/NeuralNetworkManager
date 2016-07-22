@@ -1,5 +1,6 @@
 import tornado.ioloop
 import tornado.web
+import tornado.websocket
 from tornado import gen
 from tornado.queues import Queue
 
@@ -86,6 +87,8 @@ def save(callback=None):
 	with open('./'+name+'/parameters.json', 'w') as fp:
 		json.dump(savedParams, fp, separators=(',', ':'), sort_keys=True, indent=4)
 
+	print "Backup complete."
+
 @return_future
 def load(callback=None):
 	if app.initialized == False:
@@ -96,11 +99,23 @@ def load(callback=None):
 	temp = app.network.params
 	for i in range(0, len(jsonObj)):
 		app.network.params[i].set_value(np.float32(np.array(jsonObj[str(i)])))
+	print "Load successful."
 
-	if temp == app.network.params:
-		print 'Load succcesful :)'
-	else:
-		print 'Sorry, load failed :('
+#############################
+#
+#	WebSockets
+#
+#############################
+
+class WebSocketHandler(tornado.websocket.WebSocketHandler):
+    def open(self):
+        print("WebSocket opened")
+
+    def on_message(self, message):
+        self.write_message(u"You said: " + message)
+
+    def on_close(self):
+        print("WebSocket closed")
 
 #############################
 #
@@ -114,7 +129,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
 	def get(self):
-		self.write(renderTemplate("main.html"))
+		self.write(renderTemplate("main.html"), )
 
 class SavedStatesHandler(BaseHandler):
 	def get(self):
@@ -288,12 +303,13 @@ app = tornado.web.Application([
 	(r"/load", LoadHandler),
 	(r"/train", TrainHandler),
 	(r"/stop", StopHandler),
+	(r"/websocket", WebSocketHandler),
 	(r"/saveParams", SaveParameterHandler),
 	(r"/loadParams", LoadParameterHandler),
 	(r"/snapshot", SnapshotHandler),
 	(r"/login", LoginHandler),
 	(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
-], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77")
+], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77", compiled_template_cache=False)
 app.initialized = False
 app.stopState = False
 app.snapshot = 'No Snapshot'
