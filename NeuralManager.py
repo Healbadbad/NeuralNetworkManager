@@ -43,9 +43,15 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 @gen.coroutine
 def initNetwork(callback=None):
 	print "doing the thing"
+	for sock in app.openSockets:
+		sock.write_message(u"Compiling your model.")
 	from mnistManaged import MnistNetwork
 	app.network = MnistNetwork()
 	app.initialized = True
+	for sock in app.openSockets:
+		sock.write_message(u"Model Compiled.")
+	app.currentIterations = 0
+
 
 @gen.coroutine
 def train(callback=None):
@@ -53,6 +59,15 @@ def train(callback=None):
 		print "network not yet initialized"
 		return
 	app.train_err = app.network.train()
+	validation()
+	snapshot()
+	app.currentIterations +=1
+	for sock in app.openSockets:
+		sock.write_message(u"Epoch: " + str(app.currentIterations) + "\n<br>" + 
+			"train err: " + str(app.train_err) + "\n <br>" + 
+			"val acc: " + str(app.val_acc) + "\n <br>" + 
+			app.snapshot)
+	# app.openSockets
 
 @gen.coroutine
 def validation(callback=None):
@@ -110,12 +125,14 @@ def load(callback=None):
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print("WebSocket opened")
+        app.openSockets.append(self)
 
     def on_message(self, message):
-        self.write_message(u"You said: " + message)
+        self.write_message(u"Snapshot socket connected")
 
     def on_close(self):
         print("WebSocket closed")
+        app.openSockets.remove(self)
 
 #############################
 #
@@ -216,11 +233,6 @@ class StopHandler(BaseHandler):
 			# print "here?"
 			app.stopState = True
 
-			# tornado.ioloop.IOLoop.current().close()
-			# tornado.ioloop.IOLoop.current().spawn_callback(consumer)
-			# tornado.ioloop.IOLoop.current().start()
-		# tornado.ioloop.IOLoop.current().spawn_callback(tester)
-		#TODO
 
 def wowhandler():
 	print "wow"
@@ -280,16 +292,6 @@ def consumer():
 				print('tick')
 
 
-
-
-		# try:
-		# 	print 'Doing work on'
-		# 	item()
-		# 	print "item completed"
-		# 	yield gen.sleep(0.01)
-		# finally:
-		# 	actionQueue.task_done()
-
 app = ''
 
 log.startLogging(sys.stdout)
@@ -313,6 +315,7 @@ app = tornado.web.Application([
 app.initialized = False
 app.stopState = False
 app.snapshot = 'No Snapshot'
+app.openSockets = []
 
 
 @gen.coroutine

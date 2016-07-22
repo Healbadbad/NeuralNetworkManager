@@ -73,7 +73,7 @@ class MnistNetwork():
 			train_batches += 1
 
 		print("done training")
-		return train_err
+		return train_err / train_batches
 
 	def val_acc(self):
 		# And a full pass over the validation data:
@@ -87,9 +87,9 @@ class MnistNetwork():
 			val_acc += acc
 			val_batches += 1
 
-		self.recorded_acc = val_acc
+		self.recorded_acc = val_acc / val_batches * 100
 
-		return val_acc
+		return self.recorded_acc
 
 	def snapshot(self):
 		''' an HTML-renderable object that represents the progress of the neural network '''
