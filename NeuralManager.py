@@ -252,7 +252,7 @@ app.snapshot = 'No Snapshot'
 
 @gen.coroutine
 def main():
-	app.listen(8888)
+	app.listen(80)
 	tornado.ioloop.IOLoop.current().spawn_callback(consumer)
 	# future = futureCreator(consumer)
 	# gen.with_timeout(time.time() + 100, future)
