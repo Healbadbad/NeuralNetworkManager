@@ -51,14 +51,14 @@ def train(callback=None):
 		return
 	app.train_err = app.network.train()
 
-@return_future
+@gen.coroutine
 def validation(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
 	app.val_acc = app.network.val_acc()
 
-@return_future
+@gen.coroutine
 def snapshot(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
@@ -66,6 +66,9 @@ def snapshot(callback=None):
 	print sys.getsizeof(app.network)
 	app.snapshot = app.network.snapshot()
 
+@gen.coroutine
+def idle(callback=None):
+	gen.sleep(0.01)
 # def save():
 
 
@@ -199,6 +202,7 @@ def consumer():
 				for item in range(actionQueue.qsize()):
 					actionQueue.get()
 					actionQueue.task_done()
+				future = runner.futureCreator(idle)
 				print "queue supposedly emptied, ",actionQueue.qsize()
 				app.stopState = False
 				break
