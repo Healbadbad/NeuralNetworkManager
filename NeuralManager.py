@@ -22,6 +22,7 @@ initialized = False
 actionQueue = Queue()
 ourSecretPassword = "password"
 ourSecretUsername = "guinness"
+name = "digitRecognizer"
 
 root = os.path.join(os.path.dirname(__file__), ".")
 lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
@@ -75,8 +76,15 @@ def save(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
-	print 'futureeeeee'
-	print app.network.params
+	if not os.path.exists(name):
+		os.makedirs(name)
+
+	savedParams = {}
+	for i in range(0, len(app.network.params)):
+		savedParams[i] = app.network.params[i].get_value().tolist()
+
+	with open('./'+name+'/parameters.json', 'w') as fp:
+		json.dump(savedParams, fp)
 
 #############################
 #
