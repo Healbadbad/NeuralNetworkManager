@@ -5,8 +5,9 @@ ws.onopen = function() {
 };
 
 ws.onmessage = function (evt) {
-   var span = document.getElementById("snapshot"),
-    text = document.createTextNode(''+evt.data);
-	span.innerHTML = ''; // clear existing
-	span.appendChild(text);
+	var target = document.getElementById("snapshot");
+	var div = document.createElement('div');
+	target.innerHTML = evt.data; // clear existing
+	var elements = div.childNodes;
+	// span.appendChild(text);
 };
