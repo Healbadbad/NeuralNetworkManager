@@ -84,7 +84,7 @@ def save(callback=None):
 		savedParams[i] = app.network.params[i].get_value().tolist()
 
 	with open('./'+name+'/parameters.json', 'w') as fp:
-		json.dump(savedParams, fp)
+		json.dump(savedParams, fp, separators=(',', ':'), sort_keys=True, indent=4)
 
 @return_future
 def load(callback=None):
@@ -93,12 +93,14 @@ def load(callback=None):
 		return
 	obj = codecs.open('./'+name+'/parameters.json', 'r', encoding='utf-8').read()
 	jsonObj = json.loads(obj)
-	params = []
+	temp = app.network.params
 	for i in range(0, len(jsonObj)):
-		params.append(np.array(jsonObj[str(i)]))
-	print params
-	if params == app.network.params:
-		print 'fuck yes'
+		app.network.params[i].set_value(np.float32(np.array(jsonObj[str(i)])))
+
+	if temp == app.network.params:
+		print 'Load succcesful :)'
+	else:
+		print 'Sorry, load failed :('
 
 #############################
 #
