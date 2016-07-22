@@ -43,7 +43,6 @@ def initNetwork(callback=None):
 	app.network = MnistNetwork()
 	app.initialized = True
 
-
 @gen.coroutine
 def train(callback=None):
 	if app.initialized == False:

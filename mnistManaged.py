@@ -21,7 +21,6 @@ class MnistNetwork():
 	def __init__(self):
 		print("Loading data...")
 		self.X_train, self.y_train, self.X_val, self.y_val, self.X_test, self.y_test = self.load_dataset()
-
 		# Prepare Theano variables for inputs and targets
 		input_var = T.tensor4('inputs')
 		target_var = T.ivector('targets')
@@ -38,9 +37,9 @@ class MnistNetwork():
 		# Create update expressions for training, i.e., how to modify the
 		# parameters at each training step. Here, we'll use Stochastic Gradient
 		# Descent (SGD) with Nesterov momentum, but Lasagne offers plenty more.
-		params = lasagne.layers.get_all_params(network, trainable=True)
+		self.params = lasagne.layers.get_all_params(network, trainable=True)
 		updates = lasagne.updates.nesterov_momentum(
-				loss, params, learning_rate=0.01, momentum=0.9)
+				loss, self.params, learning_rate=0.01, momentum=0.9)
 
 		# Create a loss expression for validation/testing. The crucial difference
 		# here is that we do a deterministic forward pass through the network,
@@ -69,7 +68,7 @@ class MnistNetwork():
 		start_time = time.time()
 		for batch in self.iterate_minibatches(self.X_train, self.y_train, 500, shuffle=True):
 			inputs, targets = batch
-			
+
 			train_err += self.train_fn(inputs, targets)
 			train_batches += 1
 
