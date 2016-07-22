@@ -36,7 +36,16 @@ $("#login").click(function() {
  });
 
  $("#save").click(function() {
-   $.ajax("/save", {
+   $.ajax("/saveParams", {
+     contentType : 'application/json',
+     type : 'POST',
+     success: function(data) {
+     }
+   });
+ });
+
+ $("#load").click(function() {
+   $.ajax("/loadParams", {
      contentType : 'application/json',
      type : 'POST',
      success: function(data) {

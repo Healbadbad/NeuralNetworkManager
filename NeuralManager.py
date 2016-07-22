@@ -17,6 +17,8 @@ import signal
 import json
 from datetime import timedelta
 import time
+import codecs
+import numpy as np
 network = ''
 initialized = False
 actionQueue = Queue()
@@ -70,7 +72,6 @@ def snapshot(callback=None):
 def idle(callback=None):
 	gen.sleep(0.01)
 
-
 @return_future
 def save(callback=None):
 	if app.initialized == False:
@@ -78,13 +79,28 @@ def save(callback=None):
 		return
 	if not os.path.exists(name):
 		os.makedirs(name)
-
 	savedParams = {}
 	for i in range(0, len(app.network.params)):
 		savedParams[i] = app.network.params[i].get_value().tolist()
 
 	with open('./'+name+'/parameters.json', 'w') as fp:
-		json.dump(savedParams, fp)
+		json.dump(savedParams, fp, separators=(',', ':'), sort_keys=True, indent=4)
+
+@return_future
+def load(callback=None):
+	if app.initialized == False:
+		print "network not yet initialized"
+		return
+	obj = codecs.open('./'+name+'/parameters.json', 'r', encoding='utf-8').read()
+	jsonObj = json.loads(obj)
+	temp = app.network.params
+	for i in range(0, len(jsonObj)):
+		app.network.params[i].set_value(np.float32(np.array(jsonObj[str(i)])))
+
+	if temp == app.network.params:
+		print 'Load succcesful :)'
+	else:
+		print 'Sorry, load failed :('
 
 #############################
 #
@@ -164,6 +180,15 @@ class SaveParameterHandler(BaseHandler):
 			print "Saving current network parameters..."
 			starttime = time.time()
 			yield actionQueue.put(save)
+			self.write("time taken: " + str(time.time() - starttime))
+
+class LoadParameterHandler(BaseHandler):
+	@gen.coroutine
+	def post(self):
+		if self.current_user == ourSecretUsername:
+			print "Loading selected network parameters..."
+			starttime = time.time()
+			yield actionQueue.put(load)
 			self.write("time taken: " + str(time.time() - starttime))
 
 class StopHandler(BaseHandler):
@@ -263,7 +288,8 @@ app = tornado.web.Application([
 	(r"/load", LoadHandler),
 	(r"/train", TrainHandler),
 	(r"/stop", StopHandler),
-	(r"/save", SaveParameterHandler),
+	(r"/saveParams", SaveParameterHandler),
+	(r"/loadParams", LoadParameterHandler),
 	(r"/snapshot", SnapshotHandler),
 	(r"/login", LoginHandler),
 	(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
