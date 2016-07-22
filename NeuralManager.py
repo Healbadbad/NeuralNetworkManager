@@ -22,6 +22,7 @@ initialized = False
 actionQueue = Queue()
 ourSecretPassword = "password"
 ourSecretUsername = "guinness"
+name = "digitRecognizer"
 
 root = os.path.join(os.path.dirname(__file__), ".")
 lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
@@ -42,7 +43,6 @@ def initNetwork(callback=None):
 	from mnistManaged import MnistNetwork
 	app.network = MnistNetwork()
 	app.initialized = True
-	
 
 @gen.coroutine
 def train(callback=None):
@@ -69,9 +69,22 @@ def snapshot(callback=None):
 @gen.coroutine
 def idle(callback=None):
 	gen.sleep(0.01)
-# def save():
 
 
+@return_future
+def save(callback=None):
+	if app.initialized == False:
+		print "network not yet initialized"
+		return
+	if not os.path.exists(name):
+		os.makedirs(name)
+
+	savedParams = {}
+	for i in range(0, len(app.network.params)):
+		savedParams[i] = app.network.params[i].get_value().tolist()
+
+	with open('./'+name+'/parameters.json', 'w') as fp:
+		json.dump(savedParams, fp)
 
 #############################
 #
@@ -143,6 +156,15 @@ class SnapshotHandler(BaseHandler):
 			print sys.getsizeof(app.network)
 			print app.network
 			self.write("Network Snapshot: " + str(app.snapshot))
+
+class SaveParameterHandler(BaseHandler):
+	@gen.coroutine
+	def post(self):
+		if self.current_user == ourSecretUsername:
+			print "Saving current network parameters..."
+			starttime = time.time()
+			yield actionQueue.put(save)
+			self.write("time taken: " + str(time.time() - starttime))
 
 class StopHandler(BaseHandler):
 	@gen.coroutine
@@ -241,6 +263,7 @@ app = tornado.web.Application([
 	(r"/load", LoadHandler),
 	(r"/train", TrainHandler),
 	(r"/stop", StopHandler),
+	(r"/save", SaveParameterHandler),
 	(r"/snapshot", SnapshotHandler),
 	(r"/login", LoginHandler),
 	(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
