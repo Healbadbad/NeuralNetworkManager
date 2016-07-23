@@ -8,8 +8,12 @@ from mako import exceptions
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
+from zope.interface import implementer
+
 from concurrent.futures import ThreadPoolExecutor
-from twisted.python import log
+from twisted.logger import (globalLogBeginner, Logger, jsonFileLogObserver,
+                            ILogObserver, textFileLogObserver)
+
 from tornado.concurrent import return_future
 from tornado.concurrent import run_on_executor
 
@@ -17,15 +21,18 @@ import os, sys, time
 import signal
 import json
 from datetime import timedelta
+import datetime
 import time
 import codecs
 import numpy as np
+import io
 network = ''
 initialized = False
 actionQueue = Queue()
 ourSecretPassword = "password"
 ourSecretUsername = "guinness"
 name = "digitRecognizer"
+log = Logger()
 
 root = os.path.join(os.path.dirname(__file__), ".")
 lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
@@ -43,12 +50,12 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 @gen.coroutine
 def initNetwork(callback=None):
 	print "doing the thing"
-	for sock in app.openSockets:
+	for sock in app.mainSockets:
 		sock.write_message(u"Compiling your model.")
 	from mnistManaged import MnistNetwork
 	app.network = MnistNetwork()
 	app.initialized = True
-	for sock in app.openSockets:
+	for sock in app.mainSockets:
 		sock.write_message(u"Model Compiled.")
 	app.currentIterations = 0
 
@@ -62,12 +69,12 @@ def train(callback=None):
 	validation()
 	snapshot()
 	app.currentIterations +=1
-	for sock in app.openSockets:
+	for sock in app.mainSockets:
 		sock.write_message(u"Epoch: " + str(app.currentIterations) + "\n<br>" + 
 			"train err: " + str(app.train_err) + "\n <br>" + 
 			"val acc: " + str(app.val_acc) + "\n <br>" + 
 			app.snapshot)
-	# app.openSockets
+	log.info("{value}",value="Train Error " + str(app.train_err))
 
 @gen.coroutine
 def validation(callback=None):
@@ -116,6 +123,14 @@ def load(callback=None):
 		app.network.params[i].set_value(np.float32(np.array(jsonObj[str(i)])))
 	print "Load successful."
 
+
+class Tasks():
+	''' concurrent execution of functions '''
+	executor = ThreadPoolExecutor(max_workers=4)
+
+	@run_on_executor
+	def futureCreator(self, func):
+		result = func()
 #############################
 #
 #	WebSockets
@@ -123,16 +138,35 @@ def load(callback=None):
 #############################
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
-    def open(self):
-        print("WebSocket opened")
-        app.openSockets.append(self)
+	def open(self):
+		print("WebSocket opened")
+		app.mainSockets.append(self)
 
-    def on_message(self, message):
-        self.write_message(u"Snapshot socket connected")
+	def on_message(self, message):
+		self.write_message(u"Snapshot socket connected")
 
-    def on_close(self):
-        print("WebSocket closed")
-        app.openSockets.remove(self)
+	def on_close(self):
+		print("WebSocket closed")
+		app.mainSockets.remove(self)
+
+
+class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
+	''' Handle printing of the build log to the client '''
+	def open(self):
+		print("WebSocket opened")
+		app.buildSockets.append(self)
+		for mess in app.logvar.getRecentLog(50):
+			self.write_message(mess)
+
+	def on_message(self, message):
+		# wait wat
+		pass
+
+	def on_close(self):
+		print("WebSocket closed")
+		app.buildSockets.remove(self)
+
+
 
 #############################
 #
@@ -148,6 +182,8 @@ class MainHandler(BaseHandler):
 	def get(self):
 		self.write(renderTemplate("main.html"), )
 
+
+
 class SavedStatesHandler(BaseHandler):
 	def get(self):
 		self.write(renderTemplate("savedStates.html"))
@@ -157,17 +193,6 @@ class BuildLogHandler(BaseHandler):
 		self.write(renderTemplate("buildLog.html"))
 	def post(self):
 		print self.request.body
-
-# @return_future
-# @gen.engine
-class Tasks():
-	executor = ThreadPoolExecutor(max_workers=4)
-
-	@run_on_executor
-	def futureCreator(self, func):
-		result = func()
-		# callback(result)
-		# gen.Return(func())
 
 class LoadHandler(tornado.web.RequestHandler):
 	@gen.coroutine
@@ -294,7 +319,36 @@ def consumer():
 
 app = ''
 
-log.startLogging(sys.stdout)
+
+@implementer(ILogObserver)
+class LogCapture(object):
+	def __init__(self, app):
+		self.cache = []
+		self.app = app
+	def __call__(self, event):
+		# print "received message"
+		# print event
+		# print event['value']
+		if 'log_io' in event:
+			self.cache.append(str(event['log_io']) + '\n<br>')
+			# print "event: ",event, event[val]
+			for sock in self.app.buildSockets:
+				sock.write_message(str(event['log_io']) + '\n<br>')
+
+		# sys.stdout.write(str(datetime.datetime.now()) + " [-] " + s)
+	def flush(self):
+		self.cache = []
+	def getLog(self):
+		return self.cache
+	def getRecentLog(self, num):
+		# print "here"
+		temp = []
+		if len(self.cache) > 0:
+			temp = self.cache[-num: -1]
+			temp.append(self.cache[-1])
+		return temp
+
+
 
 app = tornado.web.Application([
 	(r"/", MainHandler),
@@ -306,6 +360,7 @@ app = tornado.web.Application([
 	(r"/train", TrainHandler),
 	(r"/stop", StopHandler),
 	(r"/websocket", WebSocketHandler),
+	(r"/buildSocket", BuildLogSocketHandler),
 	(r"/saveParams", SaveParameterHandler),
 	(r"/loadParams", LoadParameterHandler),
 	(r"/snapshot", SnapshotHandler),
@@ -315,7 +370,16 @@ app = tornado.web.Application([
 app.initialized = False
 app.stopState = False
 app.snapshot = 'No Snapshot'
-app.openSockets = []
+app.mainSockets = []
+app.buildSockets = []
+
+app.logvar = LogCapture(app)
+# log.startLogging(sys.stdout) # Print to actual console
+globalLogBeginner.beginLoggingTo([app.logvar], redirectStandardIO=True)
+# log.startLogging(app.logvar)
+log.info("wow")
+
+
 
 
 @gen.coroutine
