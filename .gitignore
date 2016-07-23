@@ -1,2 +1,7 @@
 *.pyc
 tmp/
+*.gz
+*.zip
+*.rar
+*.7zip
+*.csv
