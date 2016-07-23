@@ -1,3 +1,4 @@
-.logFeed {
-  max-height: 400
+#logFeed {
+  max-height: 400px;
+  overflow-y: scroll;
 }
