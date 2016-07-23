@@ -10,5 +10,6 @@ ws.onmessage = function (evt) {
 	var div = document.createElement('div');
 	target.innerHTML = target.innerHTML + evt.data; // clear existing
 	var elements = div.childNodes;
+	target.scrollTop = target.scrollHeight;
 	// span.appendChild(text);
 };
