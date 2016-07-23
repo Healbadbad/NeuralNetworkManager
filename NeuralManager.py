@@ -330,7 +330,8 @@ class LogCapture(object):
 		# print event
 		# print event['value']
 		if 'log_io' in event:
-			self.cache.append(str(event['log_io']) + '\n<br>')
+			self.cache.append("<div class='event'><div class='content'>" 
+				+ str(event['log_io']) + '\n</div></div>')
 			# print "event: ",event, event[val]
 			for sock in self.app.buildSockets:
 				sock.write_message(str(event['log_io']) + '\n<br>')
