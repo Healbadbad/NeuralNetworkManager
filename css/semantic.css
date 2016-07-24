@@ -20708,7 +20708,7 @@ ol.ui.horizontal.list li:before,
   display: flex;
   margin: 1rem 0em;
   font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  background: #FFFFFF;
+  background: #0E0B16;
   font-weight: normal;
   border: 1px solid rgba(34, 36, 38, 0.15);
   box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
@@ -20779,7 +20779,7 @@ ol.ui.horizontal.list li:before,
   background: none;
   padding: 0.92857143em 1.14285714em;
   text-transform: none;
-  color: rgba(0, 0, 0, 0.87);
+  color: #E7DFDD;
   font-weight: normal;
   -webkit-transition: background 0.1s ease, box-shadow 0.1s ease, color 0.1s ease;
   transition: background 0.1s ease, box-shadow 0.1s ease, color 0.1s ease;
@@ -20791,14 +20791,14 @@ ol.ui.horizontal.list li:before,
 
 /* Border */
 
-.ui.menu .item:before {
+./*ui.menu .item:before {
   position: absolute;
   content: '';
   top: 0%;
   right: 0px;
   height: 100%;
-  width: 1px;
-  background: rgba(34, 36, 38, 0.1);
+  width: 1px;*/
+  /*background: rgba(34, 36, 38, 0.1);*/
 }
 
 /*--------------
@@ -20962,8 +20962,8 @@ ol.ui.horizontal.list li:before,
 }
 
 .ui.menu .ui.dropdown .menu > .item:hover {
-  background: rgba(0, 0, 0, 0.05) !important;
-  color: rgba(0, 0, 0, 0.95) !important;
+  background: #A239CA !important;
+  color: #E7DFDD !important;
 }
 
 .ui.menu .ui.dropdown .menu > .selected.item {
@@ -21131,8 +21131,8 @@ ol.ui.horizontal.list li:before,
 .ui.menu .link.item:hover,
 .ui.menu a.item:hover {
   cursor: pointer;
-  background: rgba(0, 0, 0, 0.03);
-  color: rgba(0, 0, 0, 0.95);
+  background: #A239CA !important;
+  color: #E7DFDD !important;
 }
 
 /*--------------
@@ -21167,8 +21167,8 @@ ol.ui.horizontal.list li:before,
 
 .ui.menu .active.item:hover,
 .ui.vertical.menu .active.item:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 0.95);
+  background: #A239CA !important;
+  color: #E7DFDD !important;
 }
 
 /*--------------
@@ -25239,7 +25239,7 @@ Floated Menu / Item
   display: block;
   margin: '';
   font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  color: rgba(0, 0, 0, 0.85);
+  color: #e7dfdd;
 }
 
 /* Default Header Size */
@@ -25257,6 +25257,7 @@ Floated Menu / Item
 .ui.card > .content > .meta + .description,
 .ui.card > .content > .header + .description {
   margin-top: 0.5em;
+  color: #e7dfdd;
 }
 
 /*----------------
@@ -25343,7 +25344,7 @@ Floated Menu / Item
 .ui.cards > .card .meta,
 .ui.card .meta {
   font-size: 1em;
-  color: rgba(0, 0, 0, 0.4);
+  color: #e7dfdd;
 }
 
 .ui.cards > .card .meta *,
@@ -26127,6 +26128,8 @@ a.ui.card:hover,
 
 .ui.cards > .card {
   font-size: 1em;
+  background: #0E0B16;
+
 }
 
 /*******************************

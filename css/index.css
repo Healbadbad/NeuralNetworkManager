@@ -1,6 +1,10 @@
 ::selection {
-    background: purple;
-    color: white;
+    background: #A239CA;
+    color: #E7DFDD;
+}
+
+body {
+	background: #0E0B16;
 }
 
 .nav {
@@ -11,7 +15,11 @@
 	height: 84.9%;
 }
 
-
+.page-title {
+	text-align: center;
+	margin-bottom: 1em;
+	color: #A239CA;
+}
 
 .ui.footer.form-page {
 	display: flex;
@@ -19,5 +27,7 @@
     position: absolute;
     bottom: 0;
     width: 100%;
+    background: #4717F6;
+    color: #E7DFDD;
 }
 
