@@ -1,0 +1,23 @@
+::selection {
+    background: purple;
+    color: white;
+}
+
+.nav {
+	height: 7%;
+}
+
+#content-container {
+	height: 84.9%;
+}
+
+
+
+.ui.footer.form-page {
+	display: flex;
+	height: 5%; 
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+

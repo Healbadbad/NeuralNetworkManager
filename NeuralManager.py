@@ -194,6 +194,10 @@ class BuildLogHandler(BaseHandler):
 	def post(self):
 		print self.request.body
 
+class NotebookHandler(BaseHandler):
+	def get(self):
+		self.write(renderTemplate("notebook.html"))
+
 class LoadHandler(tornado.web.RequestHandler):
 	@gen.coroutine
 	def post(self):
@@ -355,8 +359,10 @@ app = tornado.web.Application([
 	(r"/", MainHandler),
 	(r"/css/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'css')}),
 	(r"/js/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'js')}),
+	(r"/notebooks/(.*)", tornado.web.StaticFileHandler,{'path': os.path.join(root, 'notebooks')}),
 	(r"/savedStates", SavedStatesHandler),
 	(r"/buildLog", BuildLogHandler),
+	(r"/notebook", NotebookHandler),
 	(r"/load", LoadHandler),
 	(r"/train", TrainHandler),
 	(r"/stop", StopHandler),
