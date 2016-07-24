@@ -392,11 +392,12 @@ log.info("wow")
 
 @gen.coroutine
 def main():
-	http_server = tornado.httpserver.HTTPServer(app, ssl_options={
-		"certfile": "ssl\certificate.crt",
-		"keyfile": "ssl\privatekey.key",
-	})	
-	http_server.listen(443)
+	# http_server = tornado.httpserver.HTTPServer(app, ssl_options={
+	# 	"certfile": "ssl\certificate.crt",
+	# 	"keyfile": "ssl\privatekey.key",
+	# })	
+	# http_server.listen(443)
+	app.listen(80)
 	tornado.ioloop.IOLoop.current().spawn_callback(consumer)
 	# future = futureCreator(consumer)
 	# gen.with_timeout(time.time() + 100, future)
