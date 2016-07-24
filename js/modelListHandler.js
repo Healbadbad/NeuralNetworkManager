@@ -1,11 +1,12 @@
-var ws = new WebSocket("ws://localhost:80/websocket");
+var ws = new WebSocket("ws://localhost:80/modelList");
 
 ws.onopen = function() {
-   ws.send("req");
+	console.log("file listener connected!");
 };
 
 ws.onmessage = function (evt) {
-	var target = document.getElementById("snapshot");
+	console.log(evt);
+	var target = document.getElementById("model-list");
 	var div = document.createElement('div');
 	target.innerHTML = evt.data; // clear existing
 	var elements = div.childNodes;
