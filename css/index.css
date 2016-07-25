@@ -32,5 +32,11 @@ body {
 }
 
 #model-list {
-	color: #E7DFDD;
+	margin-top: 5%;
+    color: #E7DFDD;
+    display: block;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 85%;
 }

@@ -126,7 +126,7 @@ def load(callback=None):
 @return_future
 def fileGrabber(callback=None):
 	path_to_watch = "models/"
-	app.models = dict ([(f, f) for f in os.listdir (path_to_watch)])
+	app.models = [f for f in os.listdir (path_to_watch)]
 	print app.models
 
 
@@ -152,7 +152,7 @@ class ModelListHandler(tornado.websocket.WebSocketHandler):
 		fileGrabber()
 		print app.models
 		if app.models != []:
-			self.write_message(app.models)
+			self.write_message(str(app.models))
 
 	def on_message(self, message):
 		pass

@@ -1037,10 +1037,12 @@ input::selection {
 --------------------*/
 
 .ui.inverted.button {
-  box-shadow: 0px 0px 0px 2px #FFFFFF inset !important;
+  box-shadow: 0px 0px 0px 2px #E7DFDD inset !important;
   background: transparent none;
-  color: #FFFFFF;
+  color: #E7DFDD;
   text-shadow: none !important;
+  margin-left: 1%;
+  margin-right: 1%;
 }
 
 /* Group */
@@ -1066,8 +1068,8 @@ input::selection {
 /* Hover */
 
 .ui.inverted.button:hover {
-  background: #FFFFFF;
-  box-shadow: 0px 0px 0px 2px #FFFFFF inset !important;
+  background: #E7DFDD;
+  box-shadow: 0px 0px 0px 2px #E7DFDD inset !important;
   color: rgba(0, 0, 0, 0.8);
 }
 
@@ -1075,8 +1077,8 @@ input::selection {
 
 .ui.inverted.button:focus,
 .ui.inverted.button.active {
-  background: #FFFFFF;
-  box-shadow: 0px 0px 0px 2px #FFFFFF inset !important;
+  background: #E7DFDD;
+  box-shadow: 0px 0px 0px 2px #E7DFDD inset !important;
   color: rgba(0, 0, 0, 0.8);
 }
 
