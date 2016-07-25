@@ -29105,6 +29105,7 @@ body.dimmable > .dimmer {
 .ui.dropdown > input:not(.search):first-child,
 .ui.dropdown > select {
   display: none !important;
+  color: #E7DFDD;
 }
 
 /*--------------
@@ -29584,6 +29585,7 @@ select.ui.dropdown {
 .ui.active.selection.dropdown {
   border-bottom-left-radius: 0em !important;
   border-bottom-right-radius: 0em !important;
+  color: #A239CA;
 }
 
 /* Empty Connecting Border */
@@ -29635,6 +29637,7 @@ select.ui.dropdown {
   position: relative;
   left: 1px;
   z-index: 3;
+  color: #A239CA;
 }
 
 /* Search Selection */
@@ -29642,6 +29645,8 @@ select.ui.dropdown {
 .ui.search.selection.dropdown > input.search {
   line-height: 1.2142em;
   padding: 0.67861429em 2.1em 0.67861429em 1em;
+  margin: 0;
+  color: #A239CA;
 }
 
 /* Used to size multi select input to character width */
@@ -29658,6 +29663,8 @@ select.ui.dropdown {
 .ui.search.dropdown.active > input.search,
 .ui.search.dropdown.visible > input.search {
   cursor: auto;
+  margin: 0;
+  color: ;
 }
 
 .ui.search.dropdown.active > .text,

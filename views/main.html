@@ -25,7 +25,13 @@
     Load
   </button>
 
-  <div id="model-list" class="ui cards"></div>
+  <div id="model-list" class="ui fluid search selection dropdown">
+    <input type="hidden" name="country">
+    <i class="dropdown icon"></i>
+    <div class="default text">Select Model</div>
+    <div id="model-list-wrapper" class="menu"></div>
+  </div>
+  <!-- <div id="model-list" class="ui cards"></div> -->
 
   <script src="/js/modelListHandler.js"></script>
   <script src="/js/buttonHandler.js"></script>
