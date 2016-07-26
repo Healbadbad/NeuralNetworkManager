@@ -140,21 +140,18 @@ class Tasks():
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
-		print("WebSocket opened")
 		app.mainSockets.append(self)
 
 	def on_message(self, message):
 		self.write_message(u"Snapshot socket connected")
 
 	def on_close(self):
-		print("WebSocket closed")
 		app.mainSockets.remove(self)
 
 
 class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
 	''' Handle printing of the build log to the client '''
 	def open(self):
-		print("WebSocket opened")
 		app.buildSockets.append(self)
 		for mess in app.logvar.getRecentLog(50):
 			self.write_message(mess)
@@ -164,7 +161,6 @@ class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
 		pass
 
 	def on_close(self):
-		print("WebSocket closed")
 		app.buildSockets.remove(self)
 
 
@@ -258,9 +254,6 @@ class StopHandler(BaseHandler):
 	def post(self):
 		if self.current_user == ourSecretUsername:
 			print "Stopping Neural Network and Backing up"
-
-			# tornado.ioloop.IOLoop.current().stop()
-			# print "here?"
 			app.stopState = True
 
 
@@ -291,10 +284,6 @@ def convertRequestArgs(args):
 	return json.loads(args)
 
 @gen.coroutine
-def tester():
-	print "tester here"
-
-@gen.coroutine
 def consumer():
 	runner = Tasks()
 	while True:
@@ -313,16 +302,11 @@ def consumer():
 
 			try:
 				result = yield gen.with_timeout(time.time() + 1, future)
-				# print result
 				actionQueue.task_done()
 				print "ding fries are done"
-				# yield gen.sleep(0.01)
 				break
 			except gen.TimeoutError:
 				print('tick')
-
-
-app = ''
 
 
 @implementer(ILogObserver)
@@ -331,23 +315,18 @@ class LogCapture(object):
 		self.cache = []
 		self.app = app
 	def __call__(self, event):
-		# print "received message"
-		# print event
-		# print event['value']
 		if 'log_io' in event:
 			self.cache.append("<div class='event'><div class='content'>" 
 				+ str(event['log_io']) + '\n</div></div>')
-			# print "event: ",event, event[val]
 			for sock in self.app.buildSockets:
 				sock.write_message(str(event['log_io']) + '\n<br>')
 
-		# sys.stdout.write(str(datetime.datetime.now()) + " [-] " + s)
+
 	def flush(self):
 		self.cache = []
 	def getLog(self):
 		return self.cache
 	def getRecentLog(self, num):
-		# print "here"
 		temp = []
 		if len(self.cache) > 0:
 			temp = self.cache[-num: -1]
