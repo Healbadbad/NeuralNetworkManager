@@ -50,12 +50,19 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 
 @gen.coroutine
 def initNetwork(callback=None):
-	print "doing the thing"
+	
 	for sock in app.mainSockets:
-		sock.write_message(u"Compiling your model.")
-	mod = importlib.import_module(app.model)
-	clsmembers = inspect.getmembers(mod, inspect.isclass)
-	app.network = clsmembers[0][1]()
+			sock.write_message(u"Compiling your model.")
+	try:
+		mod = importlib.import_module(app.model)
+		clsmembers = inspect.getmembers(mod, inspect.isclass)
+		app.network = clsmembers[0][1]()
+	except:
+		for sock in app.mainSockets:
+			sock.write_message(u"Error loading file.")
+		print "Selected model, "+ app.model, ", not available."
+		return
+	app.times = []
 	app.initialized = True
 	for sock in app.mainSockets:
 		sock.write_message(u"Model Compiled.")
@@ -67,12 +74,18 @@ def train(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
+	starttime = time.time()
 	app.train_err = app.network.train()
+	dt = time.time() - starttime
+	app.times.append(dt)
 	validation()
 	snapshot()
+	app.iterationsToGo -=1
 	app.currentIterations +=1
 	for sock in app.mainSockets:
 		sock.write_message(u"Epoch: " + str(app.currentIterations) + "\n<br>" + 
+			"avg epoch time: " + str(sum(app.times) / float(len(app.times))) + "s\n<br>" +
+			"predicted time left: " + str((sum(app.times) / float(len(app.times)))*app.iterationsToGo ) +"s\n<br>" + 
 			"train err: " + str(app.train_err) + "\n <br>" + 
 			"val acc: " + str(app.val_acc) + "\n <br>" + 
 			app.snapshot)
@@ -145,10 +158,25 @@ class Tasks():
 #
 #############################
 
+class WebSocketHandler(tornado.websocket.WebSocketHandler):
+	def open(self):
+		print("WebSocket opened")
+		app.mainSockets.append(self)
+		self.write_message(u"Snapshot socket connected")
+
+
+	def on_message(self, message):
+		self.write_message(u"Snapshot socket connected")
+
+	def on_close(self):
+		print("WebSocket closed")
+		app.mainSockets.remove(self)
+
+
 class ModelListHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
 		print("FileListener opened")
-		app.mainSockets.append(self)
+		app.modelSockets.append(self)
 		# while 1:
 			# time.sleep(5)
 		fileGrabber()
@@ -161,7 +189,7 @@ class ModelListHandler(tornado.websocket.WebSocketHandler):
 
 	def on_close(self):
 		print("FileListener closed")
-		app.mainSockets.remove(self)
+		app.modelSockets.remove(self)
 
 class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
 	''' Handle printing of the build log to the client '''
@@ -227,6 +255,7 @@ class TrainHandler(BaseHandler):
 			starttime = time.time()
 			yield actionQueue.put(train)
 			self.write("time taken: " + str(time.time() - starttime))
+			app.iterationsToGo +=1
 
 class SnapshotHandler(BaseHandler):
 	def get(self):
@@ -355,6 +384,7 @@ app = tornado.web.Application([
 	(r"/load", LoadHandler),
 	(r"/train", TrainHandler),
 	(r"/stop", StopHandler),
+	(r"/websocket", WebSocketHandler),
 	(r"/modelList", ModelListHandler),
 	(r"/buildSocket", BuildLogSocketHandler),
 	(r"/saveParams", SaveParameterHandler),
@@ -366,8 +396,10 @@ app = tornado.web.Application([
 ], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77", compiled_template_cache=False)
 app.initialized = False
 app.stopState = False
+app.iterationsToGo = 0
 app.snapshot = 'No Snapshot'
 app.mainSockets = []
+app.modelSockets = []
 app.buildSockets = []
 app.models = []
 app.model = ""
