@@ -23,10 +23,10 @@ import signal
 import json
 from datetime import timedelta
 import datetime
-import time
 import codecs
 import numpy as np
 import io
+import importlib, inspect 
 network = ''
 initialized = False
 actionQueue = Queue()
@@ -53,8 +53,9 @@ def initNetwork(callback=None):
 	print "doing the thing"
 	for sock in app.mainSockets:
 		sock.write_message(u"Compiling your model.")
-	from mnistManaged import MnistNetwork
-	app.network = MnistNetwork()
+	mod = importlib.import_module(app.model)
+	clsmembers = inspect.getmembers(mod, inspect.isclass)
+	app.network = clsmembers[0][1]()
 	app.initialized = True
 	for sock in app.mainSockets:
 		sock.write_message(u"Model Compiled.")
@@ -124,6 +125,12 @@ def load(callback=None):
 		app.network.params[i].set_value(np.float32(np.array(jsonObj[str(i)])))
 	print "Load successful."
 
+@return_future
+def fileGrabber(callback=None):
+	path_to_watch = "models/"
+	app.models = [f for f in os.listdir (path_to_watch)]
+	print app.models
+
 
 class Tasks():
 	''' concurrent execution of functions '''
@@ -138,20 +145,28 @@ class Tasks():
 #
 #############################
 
-class WebSocketHandler(tornado.websocket.WebSocketHandler):
+class ModelListHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
+		print("FileListener opened")
 		app.mainSockets.append(self)
+		# while 1:
+			# time.sleep(5)
+		fileGrabber()
+		print app.models
+		if app.models != []:
+			self.write_message(str(app.models))
 
 	def on_message(self, message):
-		self.write_message(u"Snapshot socket connected")
+		pass
 
 	def on_close(self):
+		print("FileListener closed")
 		app.mainSockets.remove(self)
-
 
 class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
 	''' Handle printing of the build log to the client '''
 	def open(self):
+		print("BuildLogSocket opened")
 		app.buildSockets.append(self)
 		for mess in app.logvar.getRecentLog(50):
 			self.write_message(mess)
@@ -161,6 +176,7 @@ class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
 		pass
 
 	def on_close(self):
+		print("BuildLogSocket closed")
 		app.buildSockets.remove(self)
 
 
@@ -177,8 +193,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
 	def get(self):
-		self.write(renderTemplate("main.html"), )
-
+		self.write(renderTemplate("main.html"))
 
 
 class SavedStatesHandler(BaseHandler):
@@ -195,15 +210,6 @@ class NotebookHandler(BaseHandler):
 	def get(self):
 		self.write(renderTemplate("notebook.html"))
 
-class LoadHandler(tornado.web.RequestHandler):
-	@gen.coroutine
-	def post(self):
-		if self.current_user == ourSecretUsername:
-			print "Initializing Neural Network"
-			starttime = time.time()
-			yield actionQueue.put(initNetwork)
-			self.write("time taken: " + str(time.time() - starttime))
-
 class LoadHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
@@ -212,7 +218,6 @@ class LoadHandler(BaseHandler):
 			starttime = time.time()
 			yield actionQueue.put(initNetwork)
 			self.write("time taken: " + str(time.time() - starttime))
-
 
 class TrainHandler(BaseHandler):
 	@gen.coroutine
@@ -256,9 +261,14 @@ class StopHandler(BaseHandler):
 			print "Stopping Neural Network and Backing up"
 			app.stopState = True
 
+class ModelHandler(BaseHandler):
+	@gen.coroutine
+	def post(self):
+		if self.current_user == ourSecretUsername:
+			app.model = self.request.body.split('=')[1].split(".")[0]
+			print app.model
+			yield actionQueue.put(initNetwork)
 
-def wowhandler():
-	print "wow"
 
 class LoginHandler(BaseHandler):
 	def post(self):
@@ -270,7 +280,6 @@ class LoginHandler(BaseHandler):
 		if args["password"] == ourSecretPassword:
 			self.set_secure_cookie("user", ourSecretUsername)
 			print "authenticated user"
-
 
 def renderTemplate(templateName, **kwargs):
 	template = lookup.get_template(templateName)
@@ -346,12 +355,13 @@ app = tornado.web.Application([
 	(r"/load", LoadHandler),
 	(r"/train", TrainHandler),
 	(r"/stop", StopHandler),
-	(r"/websocket", WebSocketHandler),
+	(r"/modelList", ModelListHandler),
 	(r"/buildSocket", BuildLogSocketHandler),
 	(r"/saveParams", SaveParameterHandler),
 	(r"/loadParams", LoadParameterHandler),
 	(r"/snapshot", SnapshotHandler),
 	(r"/login", LoginHandler),
+	(r"/model", ModelHandler),
 	(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
 ], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77", compiled_template_cache=False)
 app.initialized = False
@@ -359,10 +369,12 @@ app.stopState = False
 app.snapshot = 'No Snapshot'
 app.mainSockets = []
 app.buildSockets = []
+app.models = []
+app.model = ""
 
 app.logvar = LogCapture(app)
 # log.startLogging(sys.stdout) # Print to actual console
-globalLogBeginner.beginLoggingTo([app.logvar], redirectStandardIO=True)
+# globalLogBeginner.beginLoggingTo([app.logvar], redirectStandardIO=True)
 # log.startLogging(app.logvar)
 log.info("wow")
 
