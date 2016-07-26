@@ -26,6 +26,7 @@ import datetime
 import codecs
 import numpy as np
 import io
+import importlib, inspect 
 network = ''
 initialized = False
 actionQueue = Queue()
@@ -52,8 +53,9 @@ def initNetwork(callback=None):
 	print "doing the thing"
 	for sock in app.mainSockets:
 		sock.write_message(u"Compiling your model.")
-	from mnistManaged import MnistNetwork
-	app.network = MnistNetwork()
+	mod = importlib.import_module(app.model)
+	clsmembers = inspect.getmembers(mod, inspect.isclass)
+	app.network = clsmembers[0][1]()
 	app.initialized = True
 	for sock in app.mainSockets:
 		sock.write_message(u"Model Compiled.")
@@ -208,7 +210,7 @@ class NotebookHandler(BaseHandler):
 	def get(self):
 		self.write(renderTemplate("notebook.html"))
 
-class LoadHandler(tornado.web.RequestHandler):
+class LoadHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
 		if self.current_user == ourSecretUsername:
@@ -257,20 +259,16 @@ class StopHandler(BaseHandler):
 	def post(self):
 		if self.current_user == ourSecretUsername:
 			print "Stopping Neural Network and Backing up"
-
-			# tornado.ioloop.IOLoop.current().stop()
-			# print "here?"
 			app.stopState = True
 
 class ModelHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
 		if self.current_user == ourSecretUsername:
-			app.model = self.request.body.split('=')[1]
+			app.model = self.request.body.split('=')[1].split(".")[0]
 			print app.model
+			yield actionQueue.put(initNetwork)
 
-def wowhandler():
-	print "wow"
 
 class LoginHandler(BaseHandler):
 	def post(self):
@@ -295,10 +293,6 @@ def convertRequestArgs(args):
 	return json.loads(args)
 
 @gen.coroutine
-def tester():
-	print "tester here"
-
-@gen.coroutine
 def consumer():
 	runner = Tasks()
 	while True:
@@ -317,16 +311,11 @@ def consumer():
 
 			try:
 				result = yield gen.with_timeout(time.time() + 1, future)
-				# print result
 				actionQueue.task_done()
 				print "ding fries are done"
-				# yield gen.sleep(0.01)
 				break
 			except gen.TimeoutError:
 				print('tick')
-
-
-app = ''
 
 
 @implementer(ILogObserver)
@@ -335,23 +324,18 @@ class LogCapture(object):
 		self.cache = []
 		self.app = app
 	def __call__(self, event):
-		# print "received message"
-		# print event
-		# print event['value']
 		if 'log_io' in event:
 			self.cache.append("<div class='event'><div class='content'>" 
 				+ str(event['log_io']) + '\n</div></div>')
-			# print "event: ",event, event[val]
 			for sock in self.app.buildSockets:
 				sock.write_message(str(event['log_io']) + '\n<br>')
 
-		# sys.stdout.write(str(datetime.datetime.now()) + " [-] " + s)
+
 	def flush(self):
 		self.cache = []
 	def getLog(self):
 		return self.cache
 	def getRecentLog(self, num):
-		# print "here"
 		temp = []
 		if len(self.cache) > 0:
 			temp = self.cache[-num: -1]
@@ -390,7 +374,7 @@ app.model = ""
 
 app.logvar = LogCapture(app)
 # log.startLogging(sys.stdout) # Print to actual console
-globalLogBeginner.beginLoggingTo([app.logvar], redirectStandardIO=True)
+# globalLogBeginner.beginLoggingTo([app.logvar], redirectStandardIO=True)
 # log.startLogging(app.logvar)
 log.info("wow")
 
