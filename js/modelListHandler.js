@@ -10,8 +10,20 @@ ws.onmessage = function (evt) {
 	var target = document.getElementById("model-list-wrapper");
 	for(var key in fileList) {
 		var item = document.createElement('div');
+		var modelName = fileList[key].substring(1, fileList[key].length-1);
 		item.className = 'item';
-		item.innerHTML = fileList[key].substring(1, fileList[key].length-1);
+		item.innerHTML = modelName;
+		(function (modelName) {
+			item.onclick = function() {
+				$.ajax("/model", {
+			    	data: {modelName},
+			    	contentType : 'application/json',
+			    	type : 'POST',
+			    	success: function(data) {
+			    	}
+			   });
+			}
+		})(modelName);
 		target.appendChild(item);
 	}
 };

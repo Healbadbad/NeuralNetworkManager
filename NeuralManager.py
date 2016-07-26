@@ -217,15 +217,6 @@ class LoadHandler(tornado.web.RequestHandler):
 			yield actionQueue.put(initNetwork)
 			self.write("time taken: " + str(time.time() - starttime))
 
-class LoadHandler(BaseHandler):
-	@gen.coroutine
-	def post(self):
-		if self.current_user == ourSecretUsername:
-			print "Initializing Neural Network"
-			starttime = time.time()
-			yield actionQueue.put(initNetwork)
-			self.write("time taken: " + str(time.time() - starttime))
-
 class TrainHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
@@ -270,6 +261,13 @@ class StopHandler(BaseHandler):
 			# tornado.ioloop.IOLoop.current().stop()
 			# print "here?"
 			app.stopState = True
+
+class ModelHandler(BaseHandler):
+	@gen.coroutine
+	def post(self):
+		if self.current_user == ourSecretUsername:
+			app.model = self.request.body.split('=')[1]
+			print app.model
 
 def wowhandler():
 	print "wow"
@@ -379,6 +377,7 @@ app = tornado.web.Application([
 	(r"/loadParams", LoadParameterHandler),
 	(r"/snapshot", SnapshotHandler),
 	(r"/login", LoginHandler),
+	(r"/model", ModelHandler),
 	(r"/static/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(root, 'static')})
 ], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77", compiled_template_cache=False)
 app.initialized = False
@@ -387,6 +386,7 @@ app.snapshot = 'No Snapshot'
 app.mainSockets = []
 app.buildSockets = []
 app.models = []
+app.model = ""
 
 app.logvar = LogCapture(app)
 # log.startLogging(sys.stdout) # Print to actual console

@@ -26458,6 +26458,8 @@ a.ui.card:hover,
   margin: 0em;
   background: none;
   border-top: none;
+  margin-left: 2%;
+  width: 96%;
 }
 
 .ui.feed > .event:first-child {
