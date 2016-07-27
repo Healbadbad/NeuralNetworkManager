@@ -50,23 +50,25 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 
 @gen.coroutine
 def initNetwork(callback=None):
-	
+	app.state = "Compiling your model."
 	for sock in app.mainSockets:
-			sock.write_message(u"Compiling your model.")
+			sock.write_message(u"state&Compiling your model.")
 	try:
 		mod = importlib.import_module(app.model)
 		clsmembers = inspect.getmembers(mod, inspect.isclass)
 		app.network = clsmembers[0][1]()
 	except:
 		for sock in app.mainSockets:
-			sock.write_message(u"Error loading file.")
+			sock.write_message(u"state&Error loading file.")
 		print "Selected model, "+ app.model, ", not available."
 		return
 	app.times = []
 	app.initialized = True
 	for sock in app.mainSockets:
-		sock.write_message(u"Model Compiled.")
+		sock.write_message(u"state&Model Compiled.")
 	app.currentIterations = 0
+	app.state = "Model Compiled"
+
 
 
 @gen.coroutine
@@ -74,6 +76,10 @@ def train(callback=None):
 	if app.initialized == False:
 		print "network not yet initialized"
 		return
+	for sock in app.mainSockets:
+		sock.write_message(u"state&Training")
+	app.state = "Training"
+
 	starttime = time.time()
 	app.train_err = app.network.train()
 	dt = time.time() - starttime
@@ -82,14 +88,16 @@ def train(callback=None):
 	snapshot()
 	app.iterationsToGo -=1
 	app.currentIterations +=1
+	app.state = "Idle"
 	for sock in app.mainSockets:
-		sock.write_message(u"Epoch: " + str(app.currentIterations) + "\n<br>" + 
-			"avg epoch time: " + str(sum(app.times) / float(len(app.times))) + "s\n<br>" +
-			"predicted time left: " + str((sum(app.times) / float(len(app.times)))*app.iterationsToGo ) +"s\n<br>" + 
-			"train err: " + str(app.train_err) + "\n <br>" + 
-			"val acc: " + str(app.val_acc) + "\n <br>" + 
-			app.snapshot)
-	log.info("{value}",value="Train Error " + str(app.train_err))
+		sock.write_message(u"state&Idle")
+		sock.write_message(u"epoch&" + str(app.currentIterations))
+		sock.write_message(u"epochTarget&" + str(app.currentIterations + app.iterationsToGo))
+		sock.write_message(u"avgtime&" + "{:.2f}".format(sum(app.times) / float(len(app.times))))
+		sock.write_message(u"remaining&" + "{:.2f}".format((sum(app.times) / float(len(app.times)))*app.iterationsToGo ))
+		sock.write_message(u"trainerr&" + "{:.2f}".format(app.train_err))
+		sock.write_message(u"accuracy&" + "{:.2f}".format(app.val_acc))
+		sock.write_message(u"snapshot&" + app.snapshot)
 
 @gen.coroutine
 def validation(callback=None):
@@ -162,11 +170,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
 		print("WebSocket opened")
 		app.mainSockets.append(self)
-		self.write_message(u"Snapshot socket connected")
-
+		self.write_message(u"state&" + app.state)
 
 	def on_message(self, message):
-		self.write_message(u"Snapshot socket connected")
+		self.write_message(u"state&")
 
 	def on_close(self):
 		print("WebSocket closed")
@@ -396,6 +403,7 @@ app = tornado.web.Application([
 ], autoreload=True, cookie_secret="fe444a5c-4edf-11e6-beb8-9e71128cae77", compiled_template_cache=False)
 app.initialized = False
 app.stopState = False
+app.state = "idle"
 app.iterationsToGo = 0
 app.snapshot = 'No Snapshot'
 app.mainSockets = []
