@@ -11,7 +11,7 @@ ws.onmessage = function (evt) {
 		case "state":
 			target = document.getElementById("state");
 			target.innerHTML = payload[1];
-
+			$("#loader").hide();
 			break;
 		case "epoch":
 			target = document.getElementById("epoch");
@@ -57,7 +57,4 @@ ws.onmessage = function (evt) {
 	// var div = document.createElement('div');
 	// var elements = div.childNodes;
 	// span.appendChild(text);
-
-
-
 };

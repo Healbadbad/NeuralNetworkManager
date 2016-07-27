@@ -1,0 +1,531 @@
+.purple {
+    background: #7a0b54;
+}
+
+.purple-blue {
+    background: #5c15ce;
+}
+
+.blue {
+    background: #1f2bd4;
+}
+
+.black {
+    background: #000;
+}
+
+.white {
+    background: #eeeeee;
+}
+
+.orange {
+  background: orange;
+}
+
+.loading-wrapper {
+    position: fixed;
+    display: none;
+    margin-top: 45vh;
+    margin-left: 23vw;
+}
+
+#fathom-voice {
+  display: none;
+  margin-left: 25%;
+}
+
+@media screen and (min-width: 1060px) {
+    .loading-wrapper {
+      position: fixed;
+      margin-left: 37vw;
+    }
+}
+
+.eighty-four-backdrop {
+    position: fixed;
+    width: 195px;
+    height: 175px;
+    margin-left: 50px;
+}
+
+/**
+ *    NUMBER 8 css with animations
+*/
+
+.circle-top, .circle-bot {
+    position: fixed;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+.circle-top {
+    animation-name: eight-top;
+    animation-timing-function: ease;
+    animation-iteration-count: infinite;
+}
+
+.circle-top-inner, .circle-bot-inner {
+    position: fixed;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    margin-left: 22px;
+    margin-top: 22px;
+    z-index: 2;
+}
+
+.circle-bot {
+    margin-top: 75px;
+}
+
+.circle-bot-inner {
+    margin-top: 100px;
+}
+
+#top-eight-animation {
+    position: fixed;
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+    z-index: 1;
+    margin-left: -25px;
+    margin-top: -25px;
+}
+
+.circle-animation-one {
+    background: transparent;
+    stroke-dasharray: 500;
+    stroke-dashoffset: 0;
+    -webkit-animation: eightTop 2s ease;
+    animation: eightTop 2s ease;
+    animation-iteration-count: infinite;
+}
+
+@keyframes eightTop {
+  0% {
+      stroke-dashoffset: 0;
+  }
+  50% {
+      stroke-dashoffset: 500;
+  }
+  100% {
+      stroke-dashoffset: 0;
+  }
+}
+
+#bot-eight-animation {
+    position: fixed;
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+    z-index: 1;
+    margin-left: -25px;
+    margin-top: 53px;
+}
+
+.circle-animation-two {
+    background: transparent;
+    stroke-dasharray: 500;
+    stroke-dashoffset: 0;
+    -webkit-animation: eightBot 2s ease;
+    animation: eightBot 2s ease;
+    animation-iteration-count: infinite;
+}
+
+@keyframes eightBot {
+  0% {
+      stroke-dashoffset: 0;
+  }
+  50% {
+      stroke-dashoffset: 500;
+  }
+  100% {
+      stroke-dashoffset: 0;
+  }
+}
+
+/**
+ *    NUMBER 4 css with animations
+*/
+
+.four-parallelogram {
+    position: fixed;
+    width: 25px;
+    height: 125px;
+    -webkit-transform: skew(-30deg);
+    -moz-transform: skew(-30);
+    -o-transform: skew(-30);
+    margin-left: 154px;
+}
+
+.four-center-bar {
+    position: fixed;
+    width: 127px;
+    height: 25px;
+    margin-top: 125px;
+    margin-left: 118px;
+}
+
+.four-stem {
+    position: fixed;
+    width: 25px;
+    height: 85px;
+    margin-top: 90px;
+    margin-left: 195px;;
+}
+
+#four-parallelogram-animation {
+    position: fixed;
+    z-index: 1;
+    -webkit-animation: fourParallelogram 2s ease-in;
+    animation: fourParallelogram 2s ease-in;
+    animation-iteration-count: infinite;
+}
+
+@keyframes fourParallelogram {
+    0% {
+        height: 0;
+        margin-left: 190.5px;
+    }
+
+    30% {
+        height: 125px;
+        margin-left: 154px;
+    }
+}
+
+#four-center-bar-animation {
+    position: fixed;
+    -webkit-animation: fourCenter 2x linear;
+    animation: fourCenter 2s linear;
+    animation-iteration-count: infinite;
+    width: 0;
+    z-index: 0;
+}
+
+@keyframes fourCenter {
+    0% {
+        width: 0px;
+    }
+
+    30% {
+        width: 0px;
+        z-index: 1;
+    }
+
+    60% {
+        width: 127px;
+    }
+
+    100% {
+        width: 127px;
+        z-index: 1;
+    }
+}
+
+/**
+ *    Period css with animations
+*/
+
+.period {
+    position: fixed;
+    width: 25px;
+    height: 25px;
+    margin-left: 220px;
+    margin-top: 125px;
+}
+
+#period-animation {
+    -webkit-animation: period 2s ease-out;
+    animation: period 2s ease-out ;
+    animation-iteration-count: infinite;
+}
+
+@keyframes period {
+    60% {
+        margin-top: 125px;;
+    }
+
+    80% {
+        background: white;
+        margin-top: 150px;
+    }
+
+    100% {
+        background: white;
+        margin-top: 150px;
+    }
+}
+
+/**
+ *    NUMBER 5 css with animations
+*/
+
+.five-top {
+    position: fixed;
+    width: 125px;
+    height: 25px;
+    margin-left: 275px;
+}
+
+.five-stem {
+    position: fixed;
+    width: 25px;
+    height: 70px;
+    margin-left: 275px;
+    margin-top: 25px;
+    z-index: 2;
+}
+
+.five-outer-circle {
+    position: fixed;
+    width: 125px;
+    height: 120px;
+    margin-left: 275px;
+    margin-top: 55px;
+    border-radius: 45%;
+}
+
+.five-inner-circle {
+    position: fixed;
+    width: 80px;
+    height: 75px;
+    margin-left: 297px;
+    margin-top: 80px;
+    border-radius: 45%;
+}
+
+.five-inner-rect {
+    position: fixed;
+    height: 40px;
+    width: 40px;
+    margin-left: 270px;
+    margin-top: 95px;
+    z-index: 2;
+}
+
+#five-animation {
+    position: fixed;
+    width: 25px;
+    height: 25px;
+    margin-left: 375px;
+    -webkit-animation: five 2s ease;
+    animation: five 2s ease;
+    animation-iteration-count: infinite;
+    z-index: 3;
+}
+
+@keyframes five {
+    0% {
+        margin-left: 375px;
+    }
+
+    5% {
+        margin-left: 350px;
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    10% {
+        margin-left: 325px;
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+
+    15% {
+        margin-left: 300px;
+        -webkit-transform: rotate(135deg);
+        transform: rotate(135deg);
+    }
+
+    20% {
+        margin-left: 275px;
+        margin-top: 0px;
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg);
+    }
+
+    25% {
+        margin-left: 275px;
+        margin-top: 25px;
+        -webkit-transform: rotate(225deg);
+        transform: rotate(225deg);
+    }
+
+    30% {
+        margin-left: 275px;
+        margin-top: 50px;
+        -webkit-transform: rotate(270deg);
+        transform: rotate(270deg);
+    }
+
+    35% {
+        margin-left: 275px;
+        margin-top: 75px;
+        -webkit-transform: rotate(270deg);
+        transform: rotate(270deg);
+    }
+
+    40% {
+        margin-top: 55px;
+        margin-left: 305px;
+        -webkit-transform: rotate(225deg);
+        transform: rotate(225deg);
+    }
+
+    45% {
+        margin-top: 55px;
+        margin-left: 325px;
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg);
+    }
+
+    50% {
+        margin-top: 65px;
+        margin-left: 360px;
+        -webkit-transform: rotate(135deg);
+        transform: rotate(135deg);
+    }
+
+    55% {
+        margin-top: 100px;
+        margin-left: 375px;
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+
+    60% {
+        margin-top: 140px;
+        margin-left: 365px;
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    65% {
+        margin-top: 150px;
+        margin-left: 325px;
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    75% {
+        margin-top: 125px;
+        margin-left: 275px;
+        -webkit-transform: rotate(-90deg);
+        transform: rotate(-90deg);
+    }
+}
+
+
+/**
+ *    NUMBER 1 css with animations
+*/
+
+.one-parallelogram-strip {
+    position: fixed;
+    width: 30px;
+    height: 40px;
+    margin-left: 395px;
+    margin-top: 25px;
+    z-index: 2;
+}
+
+.one-parallelogram {
+    position: fixed;
+    width: 25px;
+    height: 60px;
+    -webkit-transform: skew(-40deg);
+    -moz-transform: skew(-40);
+    -o-transform: skew(-40);
+    margin-left: 420px;
+}
+
+.one-stem {
+    position: fixed;
+    width: 25px;
+    height: 175px;
+    margin-left: 445px;
+}
+
+#one-parallelogram-animation {
+    -webkit-animation: oneParallelogram 2s ease;
+    animation: oneParallelogram 2s ease;
+    animation-iteration-count: infinite;
+}
+
+@keyframes oneParallelogram {
+    50% {
+        background: #1f2bd4;
+    }
+
+    100% {
+        background: #1f2bd4;
+    }
+}
+
+#one-stem-animation {
+    height: 0;
+    margin-top: 175px;
+    -webkit-animation: oneStem 2s ease;
+    animation: oneStem 2s ease;
+    animation-iteration-count: infinite;
+}
+
+@keyframes oneStem {
+    50% {
+        height: 175px;
+        margin-top: 0px;
+    }
+
+    100% {
+        height: 175px;
+        margin-top: 0px;
+    }
+}
+
+/**
+ *    Degree css with animations
+*/
+
+.degree-outer {
+    position: fixed;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+}
+
+.degree-inner {
+    position: fixed;
+    width: 15px;
+    height: 15px;
+    margin-left: 5px;
+    margin-top: 5px;
+    border-radius: 50%;
+}
+
+#degree-animation {
+    margin-left: 445px;
+    margin-top: 150px;
+    width: 25px;
+    height: 25px;
+    -webkit-animation: degree 2s ease;
+    animation: degree 2s ease;
+    animation-iteration-count: infinite;
+    z-index: 3;
+}
+
+@keyframes degree {
+    40% {
+        margin-top: 0px;
+        margin-left: 445px;
+    }
+
+    50% {
+        margin-top: 0px;
+        margin-left: 485px;
+    }
+
+    100% {
+        margin-top: 0px;
+        margin-left: 485px;
+    }
+}
