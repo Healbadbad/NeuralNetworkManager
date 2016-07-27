@@ -20710,7 +20710,7 @@ ol.ui.horizontal.list li:before,
   display: flex;
   margin: 1rem 0em;
   font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  background: #0E0B16;
+  background: #c0dfd9;
   font-weight: normal;
   border: 1px solid rgba(34, 36, 38, 0.15);
   box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
@@ -20781,7 +20781,7 @@ ol.ui.horizontal.list li:before,
   background: none;
   padding: 0.92857143em 1.14285714em;
   text-transform: none;
-  color: #E7DFDD;
+  color: #3b3a36;
   font-weight: normal;
   -webkit-transition: background 0.1s ease, box-shadow 0.1s ease, color 0.1s ease;
   transition: background 0.1s ease, box-shadow 0.1s ease, color 0.1s ease;
@@ -20964,8 +20964,8 @@ ol.ui.horizontal.list li:before,
 }
 
 .ui.menu .ui.dropdown .menu > .item:hover {
-  background: #A239CA !important;
-  color: #E7DFDD !important;
+  background: #3b3a36 !important;
+  color: #c0dfd9 !important;
 }
 
 .ui.menu .ui.dropdown .menu > .selected.item {
@@ -21133,8 +21133,8 @@ ol.ui.horizontal.list li:before,
 .ui.menu .link.item:hover,
 .ui.menu a.item:hover {
   cursor: pointer;
-  background: #A239CA !important;
-  color: #E7DFDD !important;
+  background: #3b3a36 !important;
+  color: #c0dfd9 !important;
 }
 
 /*--------------
@@ -29639,7 +29639,7 @@ select.ui.dropdown {
   position: relative;
   left: 1px;
   z-index: 3;
-  color: #A239CA;
+  color: #3b3a36;
 }
 
 /* Search Selection */

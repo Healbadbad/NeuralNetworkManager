@@ -1,14 +1,14 @@
 #logFeed {
 	height: 90%;
 	overflow-y: scroll;
-	background-color: #1F1C27;
-	border: 1px solid #EEF1F6;
+	background-color: #c0dfd9;
+	/*border: 1px solid #3b3a36;*/
 	border-radius: 4px;
 	width: 85%;
     position: relative;
     margin-left: auto;
     margin-right: auto;
-    color: #E7DFDD;
+    color: #3b3a36;
 }
 
 #logFeed::-webkit-scrollbar-track {
@@ -24,5 +24,5 @@
 
 #logFeed::-webkit-scrollbar-thumb {
   	border-radius: 10px;
-	background-color: #A239CA;
+	background-color: #3b3a36;
 }
