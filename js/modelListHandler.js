@@ -10,7 +10,6 @@ $(document).ready(function() {
 	};
 
 	ws.onmessage = function (evt) {
-		console.log(evt.data);
 		var fileList = evt.data.substring(1, evt.data.length-1).split(', ');
 		var target = document.getElementById("model-list-wrapper");
 		for(var key in fileList) {
@@ -20,7 +19,6 @@ $(document).ready(function() {
 			item.innerHTML = modelName;
 			(function (modelName) {
 				item.onclick = function() {
-					console.log('selected');
 					$.ajax("/model", {
 				    	data: {modelName},
 				    	contentType : 'application/json',
@@ -29,7 +27,6 @@ $(document).ready(function() {
 				    	}
 				   	});
 					$("#loader").show();
-					console.log('show loader');
 				}
 			})(modelName);
 			target.appendChild(item);

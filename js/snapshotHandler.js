@@ -8,8 +8,6 @@ $(document).ready(function() {
 	ws.onmessage = function (evt) {
 		payload = evt.data.split("&");
 		var target = document.getElementById("snapshot");
-		console.log('snapshot');
-		console.log(evt.data);
 		switch(payload[0]){
 			case "state":
 				target = document.getElementById("state");
