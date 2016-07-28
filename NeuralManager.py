@@ -263,6 +263,9 @@ class TrainHandler(BaseHandler):
 			yield actionQueue.put(train)
 			self.write("time taken: " + str(time.time() - starttime))
 			app.iterationsToGo +=1
+			for sock in app.mainSockets:
+				sock.write_message(u"epochTarget&" + str(app.currentIterations + app.iterationsToGo))
+				sock.write_message(u"remaining&" + "{:.2f}".format((sum(app.times) / float(len(app.times)))*app.iterationsToGo ))
 
 class SnapshotHandler(BaseHandler):
 	def get(self):

@@ -25,12 +25,12 @@ ws.onmessage = function (evt) {
 			break;
 		case "avgtime":
 			target = document.getElementById("avgtime");
-			target.innerHTML = "Average Time: " + payload[1];
+			target.innerHTML = "Average Time: " + formatTime(payload[1]);
 
 			break;
 		case "remaining":
 			target = document.getElementById("remaining");
-			target.innerHTML = "Estimated Remaining Time: " + payload[1] + "s";
+			target.innerHTML = "Estimated Remaining Time: " + formatTime(payload[1]);
 
 			break;
 		case "trainerr":
@@ -58,3 +58,20 @@ ws.onmessage = function (evt) {
 	// var elements = div.childNodes;
 	// span.appendChild(text);
 };
+
+var formatTime = function(t){
+	total = parseFloat(t);
+	if(total > 3600) {
+		hours = Math.floor(total/3600);
+		minutes = Math.floor((total%3600)/60);
+		seconds = Math.floor((total%3600)%60);
+		return hours + "h:" + minutes + "m:" + seconds + "s";
+	} else if(total > 90){
+		minutes = Math.floor(total/60);
+		seconds = Math.floor(total%60);
+		return minutes + "m:" + seconds + "s";
+	} else {
+		return t + "s";
+	}
+
+}
