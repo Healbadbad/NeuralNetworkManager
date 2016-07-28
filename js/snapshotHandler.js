@@ -1,3 +1,4 @@
+
 var ws = new WebSocket("ws://localhost:80/websocket");
 
 ws.onopen = function() {
