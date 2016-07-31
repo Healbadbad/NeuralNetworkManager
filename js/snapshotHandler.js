@@ -7,12 +7,15 @@ ws.onopen = function() {
 
 ws.onmessage = function (evt) {
 	payload = evt.data.split("&");
+	console.log(payload);
+	if (payload[1] == 'Model Compiled.') {
+		$("#loader").hide();
+	}
 	var target = document.getElementById("snapshot");
 	switch(payload[0]){
 		case "state":
 			target = document.getElementById("state");
 			target.innerHTML = payload[1];
-			$("#loader").hide();
 			break;
 		case "epoch":
 			target = document.getElementById("epoch");
