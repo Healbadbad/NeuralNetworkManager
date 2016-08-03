@@ -1,8 +1,7 @@
 #logFeed {
 	height: 90%;
 	overflow-y: scroll;
-	background-color: #c0dfd9;
-	/*border: 1px solid #3b3a36;*/
+	border: 1px solid #3b3a36;
 	border-radius: 4px;
 	width: 85%;
     position: relative;

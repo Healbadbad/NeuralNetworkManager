@@ -5,19 +5,40 @@
 
 /**
     colors
-    #c0dfd9
-    #e9ece5
-    #b3c2bf
-    #3b3a36
+    #C06014
+    #EDD8CD
+    #000
+    #CDCDCD
 */
 
 body {
-	background: #e9ece5;
+	background: #f6f6f6;
 }
 
 .nav {
 	height: 7%;
 }
+
+.ui.tiered.nav.menu {
+  background: white;
+  background-image: url("/css/logo.png");
+  background-repeat: no-repeat;
+  background-position: right;
+}
+
+.ui.menu .item {
+    color: black; 
+}
+
+.ui.link.menu .item:hover,
+.ui.menu .dropdown.item:hover,
+.ui.menu .link.item:hover,
+.ui.menu a.item:hover {
+  cursor: pointer;
+  background: #C06014 !important;
+  color: white !important;
+}
+
 
 #content-container {
 	height: 84.9%;
@@ -26,7 +47,7 @@ body {
 .page-title {
 	text-align: center;
 	margin-bottom: 1em;
-	color: #3b3a36;
+	color: #C06014;
 }
 
 .ui.footer.form-page {
@@ -35,7 +56,7 @@ body {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background: #b3c2bf;
+    background: #cdcdcd;
     color: #3b3a36;
 }
 
