@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	var ctx = document.getElementById("myChart").getContext("2d")
+	var ctx = document.getElementById("myChart");
 	var data = {
 	    labels: ["January", "February", "March", "April", "May", "June", "July"],
 	    datasets: [
@@ -53,6 +53,6 @@ $(document).ready(function(){
 	    data: data,
 	    options: options
 	});
-	// ctx.style.width = "80%";
+	ctx.style.width = "95%";
 
 });

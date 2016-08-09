@@ -42,6 +42,7 @@ body {
 
 #content-container {
 	/*height: 84.9%;*/
+  width: 100%;
 }
 
 .page-title {
@@ -68,4 +69,10 @@ body {
     margin-left: auto;
     margin-right: auto;
     width: 85%;
+}
+
+canvas {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
