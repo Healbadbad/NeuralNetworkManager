@@ -1,3 +1,5 @@
+var dataSetData = [];
+var labels = [];
 
 var ws = new WebSocket("ws://localhost:80/websocket");
 
@@ -11,6 +13,7 @@ ws.onmessage = function (evt) {
 	if (payload[1] == 'Model Compiled.') {
 		$("#loader").hide();
 	}
+
 	var target = document.getElementById("snapshot");
 	switch(payload[0]){
 		case "state":
@@ -50,6 +53,7 @@ ws.onmessage = function (evt) {
 		case "snapshot":
 			target = document.getElementById("snapshot");
 			target.innerHTML = payload[1];
+			plotChart();
 
 			break;
 		default:
@@ -77,5 +81,98 @@ var formatTime = function(t){
 	} else {
 		return t + "s";
 	}
+
+}
+
+function plotChart() {
+	var ws = new WebSocket("ws://localhost:80/accuracyLoss");
+
+	ws.onopen = function() {
+		console.log("accuracyloss listener connected!");
+	};
+
+	ws.onmessage = function (evt) {
+		var dataSetData = [];
+		var labels = [];
+		var accAndErr = evt.data.split('\n');
+		var accuracies = accAndErr[0].substring(1, accAndErr[0].length-1).split(",").map(Number);
+		var trainErr =  accAndErr[1].substring(1, accAndErr[1].length-1).split(",").map(Number);
+		console.log('accuracies and stuff');
+		console.log(accuracies);
+		console.log(trainErr);
+
+		for (var i = 0; i < trainErr.length; i++) {
+			dataSetData.push(accuracies[i] / trainErr[i]);
+			labels[i] = "epoch" + (i+1);
+		}
+		console.log(dataSetData);
+
+		var ctx = document.getElementById("myChart");
+		var data = {
+		    labels: labels,
+		    datasets: [
+		        {
+		            label: "Accuracy / Loss",
+		            fill: false,
+		            lineTension: 0.1,
+		            backgroundColor: "rgba(75,192,192,0.4)",
+		            borderColor: "rgba(75,192,192,1)",
+		            borderCapStyle: 'butt',
+		            borderDash: [],
+		            borderDashOffset: 0.0,
+		            borderJoinStyle: 'miter',
+		            pointBorderColor: "rgba(75,192,192,1)",
+		            pointBackgroundColor: "#fff",
+		            pointBorderWidth: 1,
+		            pointHoverRadius: 5,
+		            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+		            pointHoverBorderColor: "rgba(220,220,220,1)",
+		            pointHoverBorderWidth: 2,
+		            pointRadius: 1,
+		            pointHitRadius: 10,
+		            data: dataSetData,
+		            spanGaps: false,
+		        }
+		    ],
+		    xAxisID: "Training Error",
+		    yAxisID: "Accuracy"
+
+		};
+
+		var options = {
+			responsive: true,
+	        title: {
+	            display: true,
+	            text: 'Accuracy / Loss in Neural Network'
+	        },
+	        legend: {
+	        	display: false,
+	        	position: "top",
+	        	labels: {
+	                fontColor: 'rgb(255, 99, 132)'
+	            }
+	        },
+	        scales: {
+	        	xAxes: [{
+	        		display: true
+	        	}],
+	            yAxes: [{
+	                display: true,
+	                scaleLabel: {
+				        display: true,
+				        labelString: 'Accuracy/Loss'
+				    }
+	            }]
+	        },
+	        scaleShowLabels : true
+	    };
+
+		var myLineChart = new Chart(ctx, {
+		    type: 'line',
+		    data: data,
+		    options: options
+		});
+		ctx.style.width = "95%";
+	};
 
 }

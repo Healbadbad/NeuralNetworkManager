@@ -69,8 +69,6 @@ def initNetwork(callback=None):
 	app.currentIterations = 0
 	app.state = "Model Compiled"
 
-
-
 @gen.coroutine
 def train(callback=None):
 	if app.initialized == False:
@@ -82,6 +80,7 @@ def train(callback=None):
 
 	starttime = time.time()
 	app.train_err = app.network.train()
+	app.train_err_arr.append(app.train_err)
 	dt = time.time() - starttime
 	app.times.append(dt)
 	validation()
@@ -105,6 +104,7 @@ def validation(callback=None):
 		print "network not yet initialized"
 		return
 	app.val_acc = app.network.val_acc()
+	app.accuracy_arr.append(app.val_acc)
 
 @gen.coroutine
 def snapshot(callback=None):
@@ -151,7 +151,6 @@ def fileGrabber(callback=None):
 	path_to_watch = "models/"
 	app.models = [f for f in os.listdir (path_to_watch)]
 	# print app.models
-
 
 class Tasks():
 	''' concurrent execution of functions '''
@@ -207,13 +206,25 @@ class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
 			self.write_message(mess)
 
 	def on_message(self, message):
-		# wait wat
 		pass
 
 	def on_close(self):
 		print("BuildLogSocket closed")
 		app.buildSockets.remove(self)
 
+class AccuracyLossSocketHandler(tornado.websocket.WebSocketHandler):
+	def open(self):
+		print("AccuracyLossHandler opened")
+		app.modelSockets.append(self)
+		if hasattr(app, 'network'):
+			self.write_message(str(app.accuracy_arr) + '\n' + str(app.train_err_arr))
+
+	def on_message(self, message):
+		pass
+
+	def on_close(self):
+		print("AccuracyLossHandler closed")
+		app.modelSockets.remove(self)
 
 
 #############################
@@ -397,6 +408,7 @@ app = tornado.web.Application([
 	(r"/websocket", WebSocketHandler),
 	(r"/modelList", ModelListHandler),
 	(r"/buildSocket", BuildLogSocketHandler),
+	(r"/accuracyLoss", AccuracyLossSocketHandler),
 	(r"/saveParams", SaveParameterHandler),
 	(r"/loadParams", LoadParameterHandler),
 	(r"/snapshot", SnapshotHandler),
@@ -414,6 +426,8 @@ app.modelSockets = []
 app.buildSockets = []
 app.models = []
 app.model = ""
+app.accuracy_arr = []
+app.train_err_arr = []
 
 app.logvar = LogCapture(app)
 # log.startLogging(sys.stdout) # Print to actual console
