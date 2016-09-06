@@ -52,30 +52,30 @@ lookup = TemplateLookup(directories=[os.path.join(root, 'views')],
 def initNetwork(callback=None):
 	app.state = "Compiling your model."
 	for sock in app.mainSockets:
-			sock.write_message(u"state&Compiling your model.")
+			sock.write_message("state&Compiling your model.")
 	try:
 		mod = importlib.import_module(app.model)
 		clsmembers = inspect.getmembers(mod, inspect.isclass)
 		app.network = clsmembers[0][1]()
 	except:
 		for sock in app.mainSockets:
-			sock.write_message(u"state&Error loading file.")
-		print "Selected model, "+ app.model, ", not available."
+			sock.write_message("state&Error loading file.")
+		print("Selected model, "+ app.model, ", not available.")
 		return
 	app.times = []
 	app.initialized = True
 	for sock in app.mainSockets:
-		sock.write_message(u"state&Model Compiled.")
+		sock.write_message("state&Model Compiled.")
 	app.currentIterations = 0
 	app.state = "Model Compiled"
 
 @gen.coroutine
 def train(callback=None):
 	if app.initialized == False:
-		print "network not yet initialized"
+		print("network not yet initialized")
 		return
 	for sock in app.mainSockets:
-		sock.write_message(u"state&Training")
+		sock.write_message("state&Training")
 	app.state = "Training"
 
 	starttime = time.time()
@@ -89,19 +89,19 @@ def train(callback=None):
 	app.currentIterations +=1
 	app.state = "Idle"
 	for sock in app.mainSockets:
-		sock.write_message(u"state&Idle")
-		sock.write_message(u"epoch&" + str(app.currentIterations))
-		sock.write_message(u"epochTarget&" + str(app.currentIterations + app.iterationsToGo))
-		sock.write_message(u"avgtime&" + "{:.2f}".format(sum(app.times) / float(len(app.times))))
-		sock.write_message(u"remaining&" + "{:.2f}".format((sum(app.times) / float(len(app.times)))*app.iterationsToGo ))
-		sock.write_message(u"trainerr&" + "{:.2f}".format(app.train_err))
-		sock.write_message(u"accuracy&" + "{:.2f}".format(app.val_acc))
-		sock.write_message(u"snapshot&" + app.snapshot)
+		sock.write_message("state&Idle")
+		sock.write_message("epoch&" + str(app.currentIterations))
+		sock.write_message("epochTarget&" + str(app.currentIterations + app.iterationsToGo))
+		sock.write_message("avgtime&" + "{:.2f}".format(sum(app.times) / float(len(app.times))))
+		sock.write_message("remaining&" + "{:.2f}".format((sum(app.times) / float(len(app.times)))*app.iterationsToGo ))
+		sock.write_message("trainerr&" + "{:.2f}".format(app.train_err))
+		sock.write_message("accuracy&" + "{:.2f}".format(app.val_acc))
+		sock.write_message("snapshot&" + app.snapshot)
 
 @gen.coroutine
 def validation(callback=None):
 	if app.initialized == False:
-		print "network not yet initialized"
+		print("network not yet initialized")
 		return
 	app.val_acc = app.network.val_acc()
 	app.accuracy_arr.append(app.val_acc)
@@ -109,9 +109,9 @@ def validation(callback=None):
 @gen.coroutine
 def snapshot(callback=None):
 	if app.initialized == False:
-		print "network not yet initialized"
+		print("network not yet initialized")
 		return
-	print sys.getsizeof(app.network)
+	print(sys.getsizeof(app.network))
 	app.snapshot = app.network.snapshot()
 
 @gen.coroutine
@@ -121,7 +121,7 @@ def idle(callback=None):
 @return_future
 def save(callback=None):
 	if app.initialized == False:
-		print "network not yet initialized"
+		print("network not yet initialized")
 		return
 	if not os.path.exists(name):
 		os.makedirs(name)
@@ -132,19 +132,19 @@ def save(callback=None):
 	with open('./'+name+'/parameters.json', 'w') as fp:
 		json.dump(savedParams, fp, separators=(',', ':'), sort_keys=True, indent=4)
 
-	print "Backup complete."
+	print("Backup complete.")
 
 @return_future
 def load(callback=None):
 	if app.initialized == False:
-		print "network not yet initialized"
+		print("network not yet initialized")
 		return
 	obj = codecs.open('./'+name+'/parameters.json', 'r', encoding='utf-8').read()
 	jsonObj = json.loads(obj)
 	temp = app.network.params
 	for i in range(0, len(jsonObj)):
 		app.network.params[i].set_value(np.float32(np.array(jsonObj[str(i)])))
-	print "Load successful."
+	print("Load successful.")
 
 @return_future
 def fileGrabber(callback=None):
@@ -169,10 +169,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
 		print("WebSocket opened")
 		app.mainSockets.append(self)
-		self.write_message(u"state&" + app.state)
+		self.write_message("state&" + app.state)
 
 	def on_message(self, message):
-		self.write_message(u"state&")
+		self.write_message("state&")
 
 	def on_close(self):
 		print("WebSocket closed")
@@ -250,7 +250,7 @@ class BuildLogHandler(BaseHandler):
 	def get(self):
 		self.write(renderTemplate("buildLog.html"))
 	def post(self):
-		print self.request.body
+		print(self.request.body)
 
 class NotebookHandler(BaseHandler):
 	def get(self):
@@ -260,7 +260,7 @@ class LoadHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
 		if self.current_user == ourSecretUsername:
-			print "Initializing Neural Network"
+			print("Initializing Neural Network")
 			starttime = time.time()
 			yield actionQueue.put(initNetwork)
 			self.write("time taken: " + str(time.time() - starttime))
@@ -269,28 +269,28 @@ class TrainHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
 		if self.current_user == ourSecretUsername:
-			print "Training Neural Network"
+			print("Training Neural Network")
 			starttime = time.time()
 			yield actionQueue.put(train)
 			self.write("time taken: " + str(time.time() - starttime))
 			app.iterationsToGo +=1
 			for sock in app.mainSockets:
-				sock.write_message(u"epochTarget&" + str(app.currentIterations + app.iterationsToGo))
-				sock.write_message(u"remaining&" + "{:.2f}".format((sum(app.times) / float(len(app.times)))*app.iterationsToGo ))
+				sock.write_message("epochTarget&" + str(app.currentIterations + app.iterationsToGo))
+				sock.write_message("remaining&" + "{:.2f}".format((sum(app.times) / float(len(app.times)))*app.iterationsToGo ))
 
 class SnapshotHandler(BaseHandler):
 	def get(self):
 		if self.current_user == ourSecretUsername:
-			print "Getting a snapshot"
-			print sys.getsizeof(app.network)
-			print app.network
+			print("Getting a snapshot")
+			print(sys.getsizeof(app.network))
+			print(app.network)
 			self.write("Network Snapshot: " + str(app.snapshot))
 
 class SaveParameterHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
 		if self.current_user == ourSecretUsername:
-			print "Saving current network parameters..."
+			print("Saving current network parameters...")
 			starttime = time.time()
 			yield actionQueue.put(save)
 			self.write("time taken: " + str(time.time() - starttime))
@@ -299,7 +299,7 @@ class LoadParameterHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
 		if self.current_user == ourSecretUsername:
-			print "Loading selected network parameters..."
+			print("Loading selected network parameters...")
 			starttime = time.time()
 			yield actionQueue.put(load)
 			self.write("time taken: " + str(time.time() - starttime))
@@ -308,7 +308,7 @@ class StopHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
 		if self.current_user == ourSecretUsername:
-			print "Stopping Neural Network and Backing up"
+			print("Stopping Neural Network and Backing up")
 			app.stopState = True
 
 class ModelHandler(BaseHandler):
@@ -316,28 +316,28 @@ class ModelHandler(BaseHandler):
 	def post(self):
 		if self.current_user == ourSecretUsername:
 			app.model = self.request.body.split('=')[1].split(".")[0]
-			print app.model
+			print(app.model)
 			yield actionQueue.put(initNetwork)
 
 
 class LoginHandler(BaseHandler):
 	def post(self):
-		print self.request.body
-		args = convertRequestArgs(self.request.body)
+		print(self.request.body)
+		args = convertRequestArgs(self.request.body.decode())
 
-		print "Send the ajax login data here for verification"
+		print("Send the ajax login data here for verification")
 
 		if args["password"] == ourSecretPassword:
 			self.set_secure_cookie("user", ourSecretUsername)
-			print "authenticated user"
+			print("authenticated user")
 
 def renderTemplate(templateName, **kwargs):
 	template = lookup.get_template(templateName)
 	args = []
 	try:
 		return template.render(*args, **kwargs)
-	except Exception, e:
-		print e
+	except Exception as e:
+		print(e)
 
 def convertRequestArgs(args):
 	return json.loads(args)
@@ -347,7 +347,7 @@ def consumer():
 	runner = Tasks()
 	while True:
 		item = yield actionQueue.get()
-		print item
+		print(item)
 		future = runner.futureCreator(item)
 		while True:
 			if app.stopState == True:
@@ -355,14 +355,14 @@ def consumer():
 					actionQueue.get()
 					actionQueue.task_done()
 				future = runner.futureCreator(idle)
-				print "queue supposedly emptied, ",actionQueue.qsize()
+				print("queue supposedly emptied, ",actionQueue.qsize())
 				app.stopState = False
 				break
 
 			try:
 				result = yield gen.with_timeout(time.time() + 1, future)
 				actionQueue.task_done()
-				print "ding fries are done"
+				print("ding fries are done")
 				break
 			except gen.TimeoutError:
 				print('tick')
@@ -450,7 +450,7 @@ def main():
 	# future = futureCreator(consumer)
 	# gen.with_timeout(time.time() + 100, future)
 	while True:
-		print "Starting continuation loop"
+		print("Starting continuation loop")
 		tornado.ioloop.IOLoop.current().start()
 
 
