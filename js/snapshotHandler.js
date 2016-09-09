@@ -85,7 +85,7 @@ var formatTime = function(t){
 }
 
 function plotChart() {
-	var ws = new WebSocket("ws://localhost:80/accuracyLoss");
+	var ws = new WebSocket("ws://137.112.158.202:80/accuracyLoss");
 
 	ws.onopen = function() {
 		console.log("accuracyloss listener connected!");

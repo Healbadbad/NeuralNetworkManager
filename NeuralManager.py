@@ -285,7 +285,7 @@ class LoadHandler(BaseHandler):
 class TrainHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
-		if self.current_user == ourSecretUsername:
+		if self.current_user.decode() == ourSecretUsername:
 			print("Training Neural Network")
 			starttime = time.time()
 			yield actionQueue.put(train)
@@ -297,7 +297,7 @@ class TrainHandler(BaseHandler):
 
 class SnapshotHandler(BaseHandler):
 	def get(self):
-		if self.current_user == ourSecretUsername:
+		if self.current_user.decode() == ourSecretUsername:
 			print("Getting a snapshot")
 			print(sys.getsizeof(app.network))
 			print(app.network)
@@ -306,7 +306,7 @@ class SnapshotHandler(BaseHandler):
 class SaveParameterHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
-		if self.current_user == ourSecretUsername:
+		if self.current_user.decode() == ourSecretUsername:
 			print("Saving current network parameters...")
 			starttime = time.time()
 			yield actionQueue.put(save)
@@ -315,7 +315,7 @@ class SaveParameterHandler(BaseHandler):
 class LoadParameterHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
-		if self.current_user == ourSecretUsername:
+		if self.current_user.decode() == ourSecretUsername:
 			print("Loading selected network parameters...")
 			starttime = time.time()
 			yield actionQueue.put(load)
@@ -324,15 +324,15 @@ class LoadParameterHandler(BaseHandler):
 class StopHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
-		if self.current_user == ourSecretUsername:
+		if self.current_user.decode() == ourSecretUsername:
 			print("Stopping Neural Network and Backing up")
 			app.stopState = True
 
 class ModelHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
-		if self.current_user == ourSecretUsername:
-			app.model = self.request.body.split('=')[1].split(".")[0]
+		if self.current_user.decode() == ourSecretUsername:
+			app.model = self.request.body.decode().split('=')[1].split(".")[0]
 			print(app.model)
 			yield actionQueue.put(initNetwork)
 
