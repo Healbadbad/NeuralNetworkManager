@@ -32,7 +32,7 @@ initialized = False
 actionQueue = Queue()
 ourSecretPassword = "password"
 ourSecretUsername = "guinness"
-
+print(tornado.version)
 name = "digitRecognizer"
 log = Logger()
 
@@ -168,6 +168,10 @@ class Tasks():
 #############################
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
+	def check_origin(self, origin):
+		return True
+        #return bool(re.match(r'^.*?\.mydomain\.com', origin))
+
 	def open(self):
 		print("WebSocket opened")
 		app.mainSockets.append(self)
@@ -182,6 +186,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
 
 class ModelListHandler(tornado.websocket.WebSocketHandler):
+	def check_origin(self, origin):
+		return True
+        #return bool(re.match(r'^.*?\.mydomain\.com', origin))
+
 	def open(self):
 		print("FileListener opened")
 		app.modelSockets.append(self)
@@ -199,6 +207,10 @@ class ModelListHandler(tornado.websocket.WebSocketHandler):
 		app.modelSockets.remove(self)
 
 class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
+	def check_origin(self, origin):
+		return True
+        #return bool(re.match(r'^.*?\.mydomain\.com', origin))
+
 	''' Handle printing of the build log to the client '''
 	def open(self):
 		print("BuildLogSocket opened")
@@ -214,6 +226,10 @@ class BuildLogSocketHandler(tornado.websocket.WebSocketHandler):
 		app.buildSockets.remove(self)
 
 class AccuracyLossSocketHandler(tornado.websocket.WebSocketHandler):
+	def check_origin(self, origin):
+		return True
+        #return bool(re.match(r'^.*?\.mydomain\.com', origin))
+        
 	def open(self):
 		print("AccuracyLossHandler opened")
 		app.modelSockets.append(self)

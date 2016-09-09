@@ -1,4 +1,4 @@
-var ws = new WebSocket("ws://localhost:80/buildSocket");
+var ws = new WebSocket("ws://137.112.158.202:80/buildSocket");
 
 ws.onopen = function() {
 	console.log("Build Log connected!");

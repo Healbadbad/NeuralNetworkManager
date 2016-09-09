@@ -3,7 +3,7 @@ $(document).ready(function() {
 	    maxSelections: 5
 	});
 
-	var ws = new WebSocket("ws://localhost:80/modelList");
+	var ws = new WebSocket("ws://137.112.158.202:80/modelList");
 
 	ws.onopen = function() {
 		console.log("file listener connected!");

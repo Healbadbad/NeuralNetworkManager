@@ -1,7 +1,7 @@
 var dataSetData = [];
 var labels = [];
 
-var ws = new WebSocket("ws://localhost:80/websocket");
+var ws = new WebSocket("ws://137.112.158.202:80/websocket");
 
 ws.onopen = function() {
    // ws.send("req");
