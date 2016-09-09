@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('.ui.dropdown').dropdown({
-	    maxSelections: 3
+	    maxSelections: 5
 	});
 
 	var ws = new WebSocket("ws://localhost:80/modelList");

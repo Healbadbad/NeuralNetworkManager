@@ -32,6 +32,7 @@ initialized = False
 actionQueue = Queue()
 ourSecretPassword = "password"
 ourSecretUsername = "guinness"
+
 name = "digitRecognizer"
 log = Logger()
 
@@ -148,6 +149,7 @@ def load(callback=None):
 
 @return_future
 def fileGrabber(callback=None):
+	print('file grab')
 	path_to_watch = "models/"
 	app.models = [f for f in os.listdir (path_to_watch)]
 	# print app.models
@@ -183,15 +185,14 @@ class ModelListHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
 		print("FileListener opened")
 		app.modelSockets.append(self)
-		# while 1:
-			# time.sleep(5)
 		fileGrabber()
-		# print app.models
+		print('pls')
+		print(app.models)
 		if app.models != []:
 			self.write_message(str(app.models))
 
 	def on_message(self, message):
-		pass
+		self.write_message(u"You said: " + message)
 
 	def on_close(self):
 		print("FileListener closed")
@@ -259,7 +260,7 @@ class NotebookHandler(BaseHandler):
 class LoadHandler(BaseHandler):
 	@gen.coroutine
 	def post(self):
-		if self.current_user == ourSecretUsername:
+		if self.current_user.decode() == ourSecretUsername:
 			print("Initializing Neural Network")
 			starttime = time.time()
 			yield actionQueue.put(initNetwork)
